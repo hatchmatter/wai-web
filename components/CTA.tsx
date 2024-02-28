@@ -18,7 +18,7 @@ const CTA = () => {
             Ready to get started?
           </h2>
           <p className="text-lg opacity-80 mb-12 md:mb-16">
-            {config.appName} helps answer your children's questions about the world.
+            {config.appName} helps answer your children&apos;s questions about the world.
           </p>
 {/* 
           <button className="btn btn-primary btn-wide">
