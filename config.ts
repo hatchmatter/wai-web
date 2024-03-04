@@ -8,10 +8,10 @@ const config = {
   appDescription:
     "Wai is a friendly voice that answers your child's questions about the world.",
   // REQUIRED (no https://, not trialing slash at the end, just the naked domain)
-  domainName: "wai.ai",
+  domainName: "wai.hatchmatter.com",
   crisp: {
     // Crisp website ID. IF YOU DON'T USE CRISP: just remove this => Then add a support email in this config file (mailgun.supportEmail) otherwise customer support won't work.
-    id: "",
+    id: "6e9a9580-90d2-47c8-a0ba-8ddfbca016df",
     // Hide Crisp by default, except on route "/". Crisp is toggled with <ButtonSupport/>. If you want to show Crisp on every routes, just remove this below
     onlyShowOnRoutes: ["/"],
   },
@@ -21,11 +21,11 @@ const config = {
       {
         // REQUIRED — we use this to find the plan in the webhook (for instance if you want to update the user's credits based on the plan)
         priceId:
-          process.env.NODE_ENV === "development"
-            ? "price_1Niyy5AxyNprDp7iZIqEyD2h"
-            : "price_456",
+          process.env.NODE_ENV === "production"
+            ? "price_1OpbgQJ1O8Av7vgva9lyEE4n"
+            : "price_1OpcN7J1O8Av7vgvGYrIobbF",
         //  REQUIRED - Name of the plan, displayed on the pricing page
-        name: "Starter",
+        name: "Wai Starter",
         // A friendly description of the plan, displayed on the pricing page. Tip: explain why this plan and not others
         description: "Perfect for occasional use",
         // The price you want to display, the one user will be charged on Stripe.
@@ -42,13 +42,14 @@ const config = {
         ],
       },
       {
+        // priceId: "price_1Opbi9J1O8Av7vgv6DhODWlL",
         priceId:
-          process.env.NODE_ENV === "development"
-            ? "price_1O5KtcAxyNprDp7iftKnrrpw"
-            : "price_456",
+          process.env.NODE_ENV === "production"
+            ? "price_1Opbi9J1O8Av7vgv6DhODWlL"
+            : "price_1OpcMfJ1O8Av7vgvBQQ9QF8c",
         // This plan will look different on the pricing page, it will be highlighted. You can only have one plan with isFeatured: true
         isFeatured: true,
-        name: "Unlimited",
+        name: "Wai Unlimited",
         description: "Talk to Wai as much as you want",
         price: 149,
         // priceAnchor: 299,

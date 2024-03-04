@@ -16,13 +16,13 @@ export default function Login() {
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
 
   const handleSignup = async (
-    e: any,
+    e: React.FormEvent<HTMLFormElement>,
     options: {
       type: string;
       provider?: Provider;
     }
   ) => {
-    e?.preventDefault();
+    e.preventDefault();
 
     setIsLoading(true);
 

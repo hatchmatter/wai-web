@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import { useRef, useState } from "react";
 import {
   AudioWsClient,
   convertFloat32ToUint8,
@@ -15,24 +15,22 @@ interface RegisterCallResponse {
 }
 
 function Wai() {
-  let liveClient: AudioWsClient;
-  let audioContext: AudioContext;
-  let isCalling: boolean = false;
-  let stream: MediaStream;
-  let captureNode: ScriptProcessorNode;
-
-  // For playback
-  let audioData: Float32Array[] = [];
-  let audioDataIndex: number = 0;
+  const wsClient = useRef<AudioWsClient>();
+  const audioContext = useRef<AudioContext>();
+  const stream = useRef<MediaStream>();
+  const captureNode = useRef<ScriptProcessorNode>();
+  const audioData = useRef<Float32Array[]>([]);
+  const audioDataIndex = useRef<number>(0);
+  const [isCalling, setIsCalling] = useState<boolean>(false);
 
   // Setup playback
   const setupAudio = async (sampleRate: number) => {
-    audioContext = new AudioContext({
+    audioContext.current = new AudioContext({
       sampleRate: sampleRate,
     });
 
     // Get mic stream
-    stream = await navigator.mediaDevices.getUserMedia({
+    stream.current = await navigator.mediaDevices.getUserMedia({
       audio: {
         sampleRate: sampleRate,
         echoCancellation: true,
@@ -41,37 +39,39 @@ function Wai() {
       },
     });
 
-    const source = audioContext.createMediaStreamSource(stream);
+    const source = audioContext.current.createMediaStreamSource(stream.current);
 
-    captureNode = source.context.createScriptProcessor(1024, 1, 1);
+    captureNode.current = source.context.createScriptProcessor(1024, 1, 1);
 
-    captureNode.onaudioprocess = function (audioProcessingEvent: any) {
-      if (isCalling) {
-        const pcmFloat32Data =
-          audioProcessingEvent.inputBuffer.getChannelData(0);
-        const pcmData = convertFloat32ToUint8(pcmFloat32Data);
-        liveClient.send(pcmData);
+    captureNode.current.onaudioprocess = function (
+      audioProcessingEvent: AudioProcessingEvent
+    ) {
+       // Send audio data (mic input) to server
+      const inputBuffer = audioProcessingEvent.inputBuffer;
+      const inputChannel = inputBuffer.getChannelData(0); // pcmFloat32Data
+      const pcmData = convertFloat32ToUint8(inputChannel);
 
-        // Playback here
-        const outputBuffer = audioProcessingEvent.outputBuffer;
-        const outputChannel = outputBuffer.getChannelData(0);
+      wsClient.current.send(pcmData);
 
-        for (let i = 0; i < outputChannel.length; ++i) {
-          if (audioData.length > 0) {
-            outputChannel[i] = audioData[0][audioDataIndex++];
-            if (audioDataIndex === audioData[0].length) {
-              audioData.shift();
-              audioDataIndex = 0;
-            }
-          } else {
-            outputChannel[i] = 0;
+      // Playback here
+      const outputBuffer = audioProcessingEvent.outputBuffer;
+      const outputChannel = outputBuffer.getChannelData(0);
+
+      for (let i = 0; i < outputChannel.length; ++i) {
+        if (audioData.current.length > 0) {
+          outputChannel[i] = audioData.current[0][audioDataIndex.current++];
+          if (audioDataIndex.current === audioData.current[0].length) {
+            audioData.current.shift();
+            audioDataIndex.current = 0;
           }
+        } else {
+          outputChannel[i] = 0;
         }
       }
     };
 
-    source.connect(captureNode);
-    captureNode.connect(audioContext.destination);
+    source.connect(captureNode.current);
+    captureNode.current.connect(audioContext.current.destination);
   };
 
   async function registerCall(agentId: string): Promise<RegisterCallResponse> {
@@ -91,13 +91,14 @@ function Wai() {
       );
 
       if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
+        throw new Error(`Error: ${response.status} - ${response.statusText}`);
       }
 
       const data: RegisterCallResponse = await response.json();
       return data;
     } catch (err) {
-      throw new Error("error");
+      console.error("Error: ", err);
+      return {};
     }
   }
 
@@ -105,6 +106,8 @@ function Wai() {
     try {
       // Call your server to get call id from post-register-call
       const registerCallResponse = await registerCall(agentId);
+
+      console.log("registerCallResponse: ", registerCallResponse);
 
       if (!registerCallResponse.callId || !registerCallResponse.sampleRate) {
         console.error("Error: Call id or sample rate not found in response.");
@@ -114,56 +117,63 @@ function Wai() {
       await setupAudio(registerCallResponse.sampleRate);
 
       //Start websocket with Retell Server
-      liveClient = new AudioWsClient(registerCallResponse.callId);
+      wsClient.current = new AudioWsClient(registerCallResponse.callId);
 
       // Handling incoming audio data for playback
-      liveClient.on("audio", (audio: Uint8Array) => {
+      wsClient.current.on("audio", (audio: Uint8Array) => {
         // const blob = new Blob([audio], { type: "audio/wav" });
         const float32Data: Float32Array = convertUint8ToFloat32(audio);
-        audioData.push(float32Data);
+        audioData.current.push(float32Data);
       });
 
       // Clear the buffer when server instructs
-      liveClient.on("clear", () => {
-        audioData = [];
-        audioDataIndex = 0;
+      wsClient.current.on("clear", () => {
+        audioData.current = [];
+        audioDataIndex.current = 0;
       });
 
       // Handle errors and close
-      liveClient.on("error", (error: string) => {
+      wsClient.current.on("error", (error: string) => {
         console.error("Call error: ", error);
         stopMic();
       });
 
-      liveClient.on("close", (code: number, reason: string) => {
+      wsClient.current.on("close", (code: number, reason: string) => {
         console.log("Call closed: ", code, reason);
         stopMic();
       });
 
-      isCalling = true;
-      audioContext.resume();
+      setIsCalling(true);
+      audioContext.current.resume();
     } catch (err) {
       console.error("Error in creating web call: ", err);
     }
   };
 
   const stopMic = () => {
-    isCalling = false;
-    liveClient?.close();
-    audioContext?.suspend();
-    captureNode?.disconnect();
-    stream?.getTracks().forEach((track: MediaStreamTrack) => track.stop());
+    if (!isCalling) return;
+
+    setIsCalling(false);
+    wsClient.current.close();
+    audioContext.current.suspend();
+    captureNode.current.disconnect();
+    stream.current
+      .getTracks()
+      .forEach((track: MediaStreamTrack) => track.stop());
   };
 
   return (
     <div className="flex h-screen items-center justify-center">
       <header className="flex gap-2">
-        <button className="btn" onClick={startMic}>
-          Start
-        </button>
-        <button className="btn" onClick={stopMic}>
-          Stop
-        </button>
+        {!isCalling ? (
+          <button className="btn btn-circle btn-lg" onClick={startMic}>
+            Start
+          </button>
+        ) : (
+          <button className="btn btn-circle btn-lg" onClick={stopMic}>
+            Stop
+          </button>
+        )}
       </header>
     </div>
   );
