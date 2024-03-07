@@ -8,9 +8,12 @@ export const dynamic = "force-dynamic";
 // See https://shipfa.st/docs/tutorials/private-page
 export default async function Dashboard() {
   return (
-    <main className="min-h-screen p-8 pb-24">
-      <section className="max-w-xl mx-auto space-y-8">
+    <main className="min-h-screen flex flex-col">
+      <section className="flex flex-col min-h-screen max-w-7xl w-full mx-auto">
+        <header className="flex items-center justify-end p-4 border-b border-gray-200">
         <ButtonAccount />
+        </header>
+        
         <Wai />
       </section>
     </main>

@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import { Viewport } from "next";
 import PlausibleProvider from "next-plausible";
 import { getSEOTags } from "@/libs/seo";
-import ClientLayout from "@/components/LayoutClient";
+import LayoutClient from "@/components/LayoutClient";
 import config from "@/config";
 import "./globals.css";
 
@@ -29,8 +29,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </head>
       )}
       <body>
-        {/* ClientLayout contains all the client wrappers (Crisp chat support, toast messages, tooltips, etc.) */}
-        <ClientLayout>{children}</ClientLayout>
+        {/* LayoutClient contains all the client wrappers (Crisp chat support, toast messages, tooltips, etc.) */}
+        <LayoutClient>{children}</LayoutClient>
       </body>
     </html>
   );

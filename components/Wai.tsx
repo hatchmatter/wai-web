@@ -6,6 +6,7 @@ import {
   convertFloat32ToUint8,
   convertUint8ToFloat32,
 } from "retell-sdk";
+import { useWakeLock } from 'react-screen-wake-lock';
 
 const agentId: string = "ddbe39893ffc8684a4c2d95b0265320c";
 
@@ -21,7 +22,15 @@ function Wai() {
   const captureNode = useRef<ScriptProcessorNode>();
   const audioData = useRef<Float32Array[]>([]);
   const audioDataIndex = useRef<number>(0);
+
   const [isCalling, setIsCalling] = useState<boolean>(false);
+  const [settingUp, setSettingUp] = useState<boolean>(false);
+
+  const { isSupported, released, request, release } = useWakeLock({
+    onRequest: () => console.log('Screen Wake Lock: requested!'),
+    onError: (e) => console.log('An error happened 💥', e),
+    onRelease: () => console.log('Screen Wake Lock: released!'),
+  });
 
   // Setup playback
   const setupAudio = async (sampleRate: number) => {
@@ -103,6 +112,7 @@ function Wai() {
   }
 
   const startMic = async () => {
+    setSettingUp(true);
     try {
       // Call your server to get call id from post-register-call
       const registerCallResponse = await registerCall(agentId);
@@ -143,8 +153,13 @@ function Wai() {
         stopMic();
       });
 
+      if (isSupported && !released) {
+        request();
+      }
+
       setIsCalling(true);
       audioContext.current.resume();
+      setSettingUp(false);
     } catch (err) {
       console.error("Error in creating web call: ", err);
     }
@@ -152,6 +167,10 @@ function Wai() {
 
   const stopMic = () => {
     if (!isCalling) return;
+
+    if (isSupported && released) {
+      release();
+    }
 
     setIsCalling(false);
     wsClient.current.close();
@@ -163,19 +182,17 @@ function Wai() {
   };
 
   return (
-    <div className="flex h-screen items-center justify-center">
-      <header className="flex gap-2">
+      <div className="flex flex-1 items-center justify-center">
         {!isCalling ? (
-          <button className="btn btn-circle btn-lg" onClick={startMic}>
+          <button className="btn btn-circle btn-lg btn-primary" onClick={startMic} disabled={settingUp}>
             Start
           </button>
         ) : (
-          <button className="btn btn-circle btn-lg" onClick={stopMic}>
+          <button className="btn btn-circle btn-lg btn-secondary" onClick={stopMic}>
             Stop
           </button>
         )}
-      </header>
-    </div>
+      </div>
   );
 }
 
