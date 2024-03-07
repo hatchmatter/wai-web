@@ -1,12 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   AudioWsClient,
   convertFloat32ToUint8,
   convertUint8ToFloat32,
 } from "retell-sdk";
-import { useWakeLock } from 'react-screen-wake-lock';
+import { useWakeLock } from "react-screen-wake-lock";
 
 const agentId: string = "ddbe39893ffc8684a4c2d95b0265320c";
 
@@ -27,10 +27,28 @@ function Wai() {
   const [settingUp, setSettingUp] = useState<boolean>(false);
 
   const { isSupported, released, request, release } = useWakeLock({
-    onRequest: () => console.log('Screen Wake Lock: requested!'),
-    onError: (e) => console.log('An error happened 💥', e),
-    onRelease: () => console.log('Screen Wake Lock: released!'),
+    onRequest: () => console.log("Screen Wake Lock: requested!"),
+    onError: (e) => console.error("An error happened 💥", e),
+    onRelease: () => console.log("Screen Wake Lock: released!"),
   });
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        stopMic();
+      }
+    };
+
+    window.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      if (isCalling) {
+        stopMic();
+      }
+
+      window.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
 
   // Setup playback
   const setupAudio = async (sampleRate: number) => {
@@ -55,7 +73,7 @@ function Wai() {
     captureNode.current.onaudioprocess = function (
       audioProcessingEvent: AudioProcessingEvent
     ) {
-       // Send audio data (mic input) to server
+      // Send audio data (mic input) to server
       const inputBuffer = audioProcessingEvent.inputBuffer;
       const inputChannel = inputBuffer.getChannelData(0); // pcmFloat32Data
       const pcmData = convertFloat32ToUint8(inputChannel);
@@ -84,40 +102,41 @@ function Wai() {
   };
 
   async function registerCall(agentId: string): Promise<RegisterCallResponse> {
-    try {
-      // Replace with your server url
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_WSS_URL}/register`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            agentId: agentId,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status} - ${response.statusText}`);
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_WSS_URL}/register`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          agentId: agentId,
+        }),
       }
+    );
 
-      const data: RegisterCallResponse = await response.json();
-      return data;
-    } catch (err) {
-      console.error("Error: ", err);
+    if (!response.ok) {
+      console.error(`Error: ${response.status} - ${response.statusText}`);
       return {};
     }
+
+    return await response.json();
   }
 
   const startMic = async () => {
     setSettingUp(true);
+
+    try {
+      if (isSupported && !released) {
+        request();
+      }
+    } catch (err) {
+      console.error("Error in requesting wake lock: ", err);
+    }
+
     try {
       // Call your server to get call id from post-register-call
       const registerCallResponse = await registerCall(agentId);
-
-      console.log("registerCallResponse: ", registerCallResponse);
 
       if (!registerCallResponse.callId || !registerCallResponse.sampleRate) {
         console.error("Error: Call id or sample rate not found in response.");
@@ -144,18 +163,13 @@ function Wai() {
 
       // Handle errors and close
       wsClient.current.on("error", (error: string) => {
-        console.error("Call error: ", error);
-        stopMic();
+        console.error("ws client error: ", error);
+        teardownAudio();
       });
 
       wsClient.current.on("close", (code: number, reason: string) => {
-        console.log("Call closed: ", code, reason);
-        stopMic();
+        teardownAudio();
       });
-
-      if (isSupported && !released) {
-        request();
-      }
 
       setIsCalling(true);
       audioContext.current.resume();
@@ -165,15 +179,7 @@ function Wai() {
     }
   };
 
-  const stopMic = () => {
-    if (!isCalling) return;
-
-    if (isSupported && released) {
-      release();
-    }
-
-    setIsCalling(false);
-    wsClient.current.close();
+  const teardownAudio = () => {
     audioContext.current.suspend();
     captureNode.current.disconnect();
     stream.current
@@ -181,18 +187,38 @@ function Wai() {
       .forEach((track: MediaStreamTrack) => track.stop());
   };
 
+  const stopMic = () => {
+    if (!isCalling) {
+      return;
+    }
+
+    if (isSupported && !released) {
+      release();
+    }
+
+    wsClient.current.close();
+    setIsCalling(false);
+  };
+
   return (
-      <div className="flex flex-1 items-center justify-center">
-        {!isCalling ? (
-          <button className="btn btn-circle btn-lg btn-primary" onClick={startMic} disabled={settingUp}>
-            Start
-          </button>
-        ) : (
-          <button className="btn btn-circle btn-lg btn-secondary" onClick={stopMic}>
-            Stop
-          </button>
-        )}
-      </div>
+    <div className="flex flex-1 items-center justify-center">
+      {!isCalling ? (
+        <button
+          className="btn btn-circle btn-lg btn-primary"
+          onClick={startMic}
+          disabled={settingUp}
+        >
+          Start
+        </button>
+      ) : (
+        <button
+          className="btn btn-circle btn-lg btn-secondary"
+          onClick={stopMic}
+        >
+          Stop
+        </button>
+      )}
+    </div>
   );
 }
 
