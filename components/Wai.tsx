@@ -4,20 +4,19 @@ import { useEffect, useState } from "react";
 import { RetellWebClient } from "retell-client-js-sdk";
 import { useWakeLock } from "react-screen-wake-lock";
 
-const agentId: string = "ddbe39893ffc8684a4c2d95b0265320c";
+import { registerCall } from "@/libs/wai";
 
-interface RegisterCallResponse {
-  callId?: string;
-  sampleRate?: number;
+if (process.env.NODE_ENV === 'production') {
+  console.log = () => {};
 }
 
-const webClient = new RetellWebClient();
+const retell = new RetellWebClient();
 
 function Wai() {
   const [isCalling, setIsCalling] = useState<boolean>(false);
   const [settingUp, setSettingUp] = useState<boolean>(false);
 
-  const { isSupported, released, request, release } = useWakeLock({
+  const { request: requestWakeLock, release: releaseWakeLock } = useWakeLock({
     // onRequest: () => console.log("Screen Wake Lock: requested!"),
     onError: (e) => console.error("An error happened 💥", e),
     // onRelease: () => console.log("Screen Wake Lock: released!"),
@@ -40,84 +39,54 @@ function Wai() {
   // Initialize the SDK
   useEffect(() => {
     // Setup event listeners
-    webClient.on("conversationStarted", () => {
-      setSettingUp(false);
+    retell.on("conversationStarted", () => {
+      requestWakeLock();
       setIsCalling(true);
+      setSettingUp(false);
       // console.log("conversationStarted");
     });
 
-    webClient.on("audio", (audio: Uint8Array) => {
-      // console.log("There is audio");
+    retell.on("audio", (audio: Uint8Array) => {
+      console.log("There is audio", audio);
     });
 
-    webClient.on("conversationEnded", ({ code, reason }) => {
-      // console.log("Closed with code:", code, ", reason:", reason);
+    retell.on("conversationEnded", ({ code, reason }) => {
+      releaseWakeLock();
       setIsCalling(false);
     });
 
-    webClient.on("error", (error) => {
+    retell.on("error", (error) => {
       console.error("An error occurred:", error);
       setIsCalling(false);
     });
 
-    webClient.on("update", (update) => {
-      // prints transcript
-      // console.log("update", update);
-    });
+    // retell.on("update", (update) => {
+    // prints transcript
+    // console.log("update", update);
+    // });
   }, []);
-
-  async function registerCall(agentId: string): Promise<RegisterCallResponse> {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_WSS_URL}/register`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          agentId: agentId,
-        }),
-      }
-    );
-
-    if (!response.ok) {
-      console.error(`Error: ${response.status} - ${response.statusText}`);
-      return {};
-    }
-
-    return await response.json();
-  }
 
   const startMic = async () => {
     setSettingUp(true);
 
-    try {
-      if (isSupported && !released) {
-        request();
-      }
-    } catch (err) {
-      console.error("Error in requesting wake lock: ", err);
-    }
-
-    const registerCallResponse = await registerCall(agentId);
+    const registerCallResponse = await registerCall();
 
     if (registerCallResponse.callId) {
-      webClient
-        .startConversation({
-          callId: registerCallResponse.callId,
-          sampleRate: registerCallResponse.sampleRate,
-          enableUpdate: true,
-        })
-        .catch(console.error);
+      try {
+        await retell
+          .startConversation({
+            callId: registerCallResponse.callId,
+            sampleRate: registerCallResponse.sampleRate,
+            // enableUpdate: true,
+          });
+      } catch (err) {
+        console.error("Error starting conversation: ", err);
+      }
     }
   };
 
   const stopMic = () => {
-    if (isSupported && !released && isCalling) {
-      release();
-    }
-
-    webClient.stopConversation();
+    retell.stopConversation();
   };
 
   return (
