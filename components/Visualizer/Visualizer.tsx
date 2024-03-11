@@ -10,7 +10,7 @@ interface VisualizerProps {
   isActive: boolean;
 }
 
-export default function Visualizer({ data, isActive }: VisualizerProps) {
+export default function Visualizer({ data, isActive }: VisualizerProps): null {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -21,13 +21,13 @@ export default function Visualizer({ data, isActive }: VisualizerProps) {
 
   return null;
 
-  return (
-    <canvas
-      ref={canvasRef}
-      id="visualizer"
-      width="300"
-      height="200"
-      style={{ aspectRatio: "unset" }}
-    ></canvas>
-  );
+  // return (
+  //   <canvas
+  //     ref={canvasRef}
+  //     id="visualizer"
+  //     width="300"
+  //     height="200"
+  //     style={{ aspectRatio: "unset" }}
+  //   ></canvas>
+  // );
 }

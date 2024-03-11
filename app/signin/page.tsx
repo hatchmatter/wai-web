@@ -48,8 +48,6 @@ export default function Login() {
           },
         });
 
-        console.log(data, error);
-
         if (error) {
           toast.error("Signups aren't allowed quite yet. Join the waitlist or come back soon.");
           console.error(error);
