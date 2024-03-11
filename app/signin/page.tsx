@@ -39,16 +39,23 @@ export default function Login() {
           },
         });
       } else if (type === "magic_link") {
-        await supabase.auth.signInWithOtp({
+        setIsDisabled(true);
+
+        const { data, error } = await supabase.auth.signInWithOtp({
           email,
           options: {
             emailRedirectTo: redirectURL,
           },
         });
 
-        toast.success("Check your email!");
+        console.log(data, error);
 
-        setIsDisabled(true);
+        if (error) {
+          toast.error("Signups aren't allowed quite yet. Join the waitlist or come back soon.");
+          console.error(error);
+        } else {
+          toast.success("Check your email!");
+        }
       }
     } catch (error) {
       console.log(error);
@@ -77,7 +84,7 @@ export default function Login() {
         </Link>
       </div>
       <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-center mb-12">
-        Sign-in or sign-up to {config.appName}{" "}
+        Sign-in to {config.appName}{" "}
       </h1>
 
       <div className="space-y-8 max-w-xl mx-auto">
