@@ -16,8 +16,8 @@ export default function Home() {
       </Suspense>
       <main>
         <Hero />
-        <Problem />
-        <FeaturesAccordion />
+        {/* <Problem /> */}
+        {/* <FeaturesAccordion /> */}
         <Pricing />
         {/* <FAQ /> */}
         <CTA />
