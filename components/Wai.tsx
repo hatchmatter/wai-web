@@ -6,7 +6,9 @@ import { useWakeLock } from "react-screen-wake-lock";
 
 import { registerCall } from "@/libs/wai";
 
-if (process.env.NODE_ENV === 'production') {
+import Visualizer from "@/components/Visualizer";
+
+if (process.env.NODE_ENV === "production") {
   console.log = () => {};
 }
 
@@ -15,6 +17,7 @@ const retell = new RetellWebClient();
 function Wai() {
   const [isCalling, setIsCalling] = useState<boolean>(false);
   const [settingUp, setSettingUp] = useState<boolean>(false);
+  const [audioData, setAudioData] = useState<Uint8Array | null>(null);
 
   const { request: requestWakeLock, release: releaseWakeLock } = useWakeLock({
     // onRequest: () => console.log("Screen Wake Lock: requested!"),
@@ -47,7 +50,8 @@ function Wai() {
     });
 
     retell.on("audio", (audio: Uint8Array) => {
-      console.log("There is audio", audio);
+      // console.log("There is audio", audio);
+      setAudioData(audio);
     });
 
     retell.on("conversationEnded", ({ code, reason }) => {
@@ -73,12 +77,11 @@ function Wai() {
 
     if (registerCallResponse.callId) {
       try {
-        await retell
-          .startConversation({
-            callId: registerCallResponse.callId,
-            sampleRate: registerCallResponse.sampleRate,
-            // enableUpdate: true,
-          });
+        await retell.startConversation({
+          callId: registerCallResponse.callId,
+          sampleRate: registerCallResponse.sampleRate,
+          // enableUpdate: true,
+        });
       } catch (err) {
         console.error("Error starting conversation: ", err);
       }
@@ -90,7 +93,7 @@ function Wai() {
   };
 
   return (
-    <div className="flex flex-1 items-center justify-center">
+    <div className="flex flex-col flex-1 items-center justify-center">
       {!isCalling ? (
         <button
           className="btn btn-circle btn-lg btn-primary"
@@ -106,7 +109,9 @@ function Wai() {
         >
           Stop
         </button>
+        
       )}
+      <Visualizer data={audioData} isActive={isCalling} />
     </div>
   );
 }

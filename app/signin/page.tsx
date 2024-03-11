@@ -132,7 +132,10 @@ export default function Login() {
             autoComplete="email"
             placeholder="tom@cruise.com"
             className="input input-bordered w-full placeholder:opacity-60"
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value)
+              setIsDisabled(false)
+            }}
           />
 
           <button
