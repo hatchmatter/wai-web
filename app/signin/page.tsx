@@ -27,7 +27,9 @@ export default function Login() {
 
     try {
       const { type, provider } = options;
-      const redirectURL = window.location.origin + "/auth/confirm";
+      const redirectURL = window.location.origin + "/api/auth/confirm";
+
+      console.log("redirectURL", redirectURL);
 
       if (type === "oauth") {
         const { error } = await supabase.auth.signInWithOAuth({
@@ -44,6 +46,7 @@ export default function Login() {
         const { error } = await supabase.auth.signInWithOtp({
           email,
           options: {
+            shouldCreateUser: false,
             emailRedirectTo: redirectURL,
           },
         });
