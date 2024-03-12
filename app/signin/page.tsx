@@ -55,7 +55,7 @@ export default function Login() {
       }
     } catch (error) {
       toast.error(error.message);
-      console.log(error);
+      console.error(error);
     } finally {
       setIsLoading(false);
     }

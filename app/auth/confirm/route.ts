@@ -27,8 +27,6 @@ export async function GET(request: NextRequest) {
 
     // For Magic Link
     if (token_hash && type) {
-      console.log("type & token_hash");
-
       const { error } = await supabase.auth.verifyOtp({
         type,
         token_hash,
@@ -43,7 +41,7 @@ export async function GET(request: NextRequest) {
       "Something went wrong while signing in! Please try again or contact support if the issue persists."
     );
   } catch (error) {
-    console.log(error);
+    console.error(error);
 
     // Redirect back to login page with error message
     const redirectTo = request.nextUrl.clone();

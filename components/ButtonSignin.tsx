@@ -25,7 +25,7 @@ const ButtonSignin = ({
 
       setUser(user);
     };
-
+    
     getUser();
   }, [supabase]);
 
