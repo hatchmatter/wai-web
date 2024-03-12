@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/libs/supabase-client";
 import config from "@/config";
 
 // A simple button to sign in with our providers (Google & Magic Links).
@@ -16,14 +16,14 @@ const ButtonSignin = ({
   text?: string;
   extraStyle?: string;
 }) => {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     const getUser = async () => {
-      const { data } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
 
-      setUser(data.user);
+      setUser(user);
     };
 
     getUser();

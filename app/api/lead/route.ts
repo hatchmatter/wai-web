@@ -1,6 +1,6 @@
-import { NextResponse, NextRequest } from "next/server";
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/libs/supabase-server";
 import { cookies } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
 
 // This route is used to store the leads that are generated from the landing page.
 // The API call is initiated by <ButtonLead /> component
@@ -12,7 +12,9 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const cookieStore = cookies();
+    const supabase = createClient(cookieStore);
+
     await supabase.from("leads").insert({ email: body.email });
 
     return NextResponse.json({});

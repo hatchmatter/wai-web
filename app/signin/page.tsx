@@ -1,61 +1,60 @@
 "use client";
 
-import React from "react";
-import Link from "next/link";
 import { useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+
+import { createClient } from "@/libs/supabase-client";
 import { Provider } from "@supabase/supabase-js";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import toast from "react-hot-toast";
+
 import config from "@/config";
 
 // This a login/singup page for Supabase Auth.
 // Successful login redirects to /api/auth/callback where the Code Exchange is processed (see app/api/auth/callback/route.js).
 export default function Login() {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
 
-  const handleSignup = async (
-    e: React.FormEvent<HTMLFormElement>,
-    options: {
-      type: string;
-      provider?: Provider;
-    }
-  ) => {
-    e.preventDefault();
-
+  const handleSignup = async (options: {
+    type: string;
+    provider?: Provider;
+  }) => {
     setIsLoading(true);
 
     try {
       const { type, provider } = options;
-      const redirectURL = window.location.origin + "/api/auth/callback";
+      const redirectURL = window.location.origin + "/auth/confirm";
 
       if (type === "oauth") {
-        await supabase.auth.signInWithOAuth({
+        const { error } = await supabase.auth.signInWithOAuth({
           provider,
           options: {
             redirectTo: redirectURL,
           },
         });
+
+        if (error) throw error;
       } else if (type === "magic_link") {
         setIsDisabled(true);
 
-        const { data, error } = await supabase.auth.signInWithOtp({
+        const { error } = await supabase.auth.signInWithOtp({
           email,
           options: {
             emailRedirectTo: redirectURL,
           },
         });
 
-        if (error) {
-          toast.error("Signups aren't allowed quite yet. Join the waitlist or come back soon.");
-          console.error(error);
-        } else {
-          toast.success("Check your email!");
-        }
+        if (error) throw error;
+
+        toast.success("Check your email!");
+
       }
     } catch (error) {
+      toast.error(error.message);
       console.log(error);
     } finally {
       setIsLoading(false);
@@ -81,6 +80,28 @@ export default function Login() {
           Home
         </Link>
       </div>
+
+      <div className="max-w-xl mx-auto mb-12">
+        {searchParams.get("error") && (
+          <div role="alert" className="alert alert-error">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="stroke-current shrink-0 h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span>{searchParams.get("error")}</span>
+          </div>
+        )}
+      </div>
+
       <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-center mb-12">
         Sign-in to {config.appName}{" "}
       </h1>
@@ -88,9 +109,7 @@ export default function Login() {
       <div className="space-y-8 max-w-xl mx-auto">
         {/* <button
           className="btn btn-block"
-          onClick={(e) =>
-            handleSignup(e, { type: "oauth", provider: "google" })
-          }
+          onClick={() => handleSignup({ type: "oauth", provider: "google" })}
           disabled={isLoading}
         >
           {isLoading ? (
@@ -128,7 +147,10 @@ export default function Login() {
 
         <form
           className="form-control w-full space-y-4"
-          onSubmit={(e) => handleSignup(e, { type: "magic_link" })}
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSignup({ type: "magic_link" });
+          }}
         >
           <input
             required
