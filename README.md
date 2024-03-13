@@ -1,6 +1,7 @@
 # WAI Web
 
 ## Development
+Wai is built on Next.js, Supabase, and Stripe. This section will guide you through setting up your development environment.
 
 ### Prerequisites
 
