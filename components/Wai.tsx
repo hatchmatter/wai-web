@@ -96,7 +96,7 @@ function Wai() {
     <div className="flex flex-col flex-1 items-center justify-center">
       {!isCalling ? (
         <button
-          className="btn btn-circle btn-lg btn-primary"
+          className="btn btn-circle btn-lg btn-primary w-36 h-36"
           onClick={startMic}
           disabled={settingUp}
         >
@@ -104,7 +104,7 @@ function Wai() {
         </button>
       ) : (
         <button
-          className="btn btn-circle btn-lg btn-secondary"
+          className="btn btn-circle btn-lg btn-secondary w-36 h-36"
           onClick={stopMic}
         >
           Stop
