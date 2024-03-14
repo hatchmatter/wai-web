@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import React, { useState, useEffect } from "react";
 import { createClient } from "@/libs/supabase-client";
 import { User } from "@supabase/supabase-js";
 import toast from "react-hot-toast";
@@ -71,7 +71,7 @@ export default function SettingsWai() {
       <div>
         <h2 className="text-base font-semibold leading-7">Wai Info</h2>
         <p className="mt-1 text-sm leading-6 ">
-          Customize Wai's name and voice.
+          Customize Wai&apos;s name and voice.
         </p>
       </div>
 
