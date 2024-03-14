@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { RetellWebClient } from "retell-client-js-sdk";
 import { useWakeLock } from "react-screen-wake-lock";
 
+import { createClient } from "@/libs/supabase-client";
 import { registerCall } from "@/libs/wai";
+import { useGetUser } from "@/hooks";
 
 import Visualizer from "@/components/Visualizer";
 
@@ -15,9 +17,11 @@ if (process.env.NODE_ENV === "production") {
 const retell = new RetellWebClient();
 
 function Wai() {
+  const user = useGetUser();
   const [isCalling, setIsCalling] = useState<boolean>(false);
   const [isSettingUp, setIsSettingUp] = useState<boolean>(false);
   const [audioData, setAudioData] = useState<Uint8Array | null>(null);
+  const supabase = createClient();
 
   const { request: requestWakeLock, release: releaseWakeLock } = useWakeLock({
     // onRequest: () => console.log("Screen Wake Lock: requested!"),
@@ -73,7 +77,13 @@ function Wai() {
   const startMic = async () => {
     setIsSettingUp(true);
 
-    const registerCallResponse = await registerCall();
+    const { data: settings } = await supabase
+      .from("settings")
+      .select("voice")
+      .eq("id", user?.id)
+      .single();
+
+    const registerCallResponse = await registerCall(settings.voice);
 
     if (registerCallResponse.callId) {
       try {
