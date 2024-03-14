@@ -16,7 +16,7 @@ const retell = new RetellWebClient();
 
 function Wai() {
   const [isCalling, setIsCalling] = useState<boolean>(false);
-  const [settingUp, setSettingUp] = useState<boolean>(false);
+  const [isSettingUp, setIsSettingUp] = useState<boolean>(false);
   const [audioData, setAudioData] = useState<Uint8Array | null>(null);
 
   const { request: requestWakeLock, release: releaseWakeLock } = useWakeLock({
@@ -45,7 +45,7 @@ function Wai() {
     retell.on("conversationStarted", () => {
       requestWakeLock();
       setIsCalling(true);
-      setSettingUp(false);
+      setIsSettingUp(false);
       // console.log("conversationStarted");
     });
 
@@ -71,7 +71,7 @@ function Wai() {
   }, []);
 
   const startMic = async () => {
-    setSettingUp(true);
+    setIsSettingUp(true);
 
     const registerCallResponse = await registerCall();
 
@@ -98,9 +98,13 @@ function Wai() {
         <button
           className="btn btn-circle btn-lg btn-primary w-36 h-36"
           onClick={startMic}
-          disabled={settingUp}
+          disabled={isSettingUp}
         >
-          Start
+          {isSettingUp ? (
+            <span className="loading loading-ring loading-lg w-24"></span>
+          ) : (
+            "Start"
+          )}
         </button>
       ) : (
         <button
@@ -109,7 +113,6 @@ function Wai() {
         >
           Stop
         </button>
-        
       )}
       <Visualizer data={audioData} isActive={isCalling} />
     </div>
