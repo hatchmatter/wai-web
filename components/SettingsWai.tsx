@@ -106,7 +106,7 @@ export default function SettingsWai() {
                 onChange={(e) =>
                   setSettings({ ...settings, voice: e.target.value })
                 }
-              > 
+              >
                 {voiceNames.map((voice) => (
                   <option key={voice} value={voice}>
                     {voice}
@@ -116,11 +116,10 @@ export default function SettingsWai() {
             </label>
           </div>
           <div>
-          <button type="submit" className="btn btn-primary">
-            Save
-          </button>
+            <button type="submit" className="btn btn-primary">
+              Save
+            </button>
           </div>
-          
         </div>
       </form>
     </div>
