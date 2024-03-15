@@ -76,7 +76,7 @@ export default function SettingsWai() {
 
       <form className="md:col-span-2" onSubmit={handleSave}>
         <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
-          {/* <div className="sm:col-span-3">
+          <div className="sm:col-span-3">
             <label className="form-control w-full max-w-xs">
               <div className="label">
                 <span className="label-text">Name</span>
@@ -92,7 +92,7 @@ export default function SettingsWai() {
                 className="input input-bordered w-full max-w-xs"
               />
             </label>
-          </div> */}
+          </div>
 
           <div className="col-span-full">
             <label className="form-control w-full max-w-xs">

@@ -79,11 +79,14 @@ function Wai() {
 
     const { data: settings } = await supabase
       .from("settings")
-      .select("voice")
+      .select("voice, assistant_name")
       .eq("id", user?.id)
       .single();
 
-    const registerCallResponse = await registerCall(settings?.voice || "shimmer");
+    const registerCallResponse = await registerCall(
+      settings?.voice || "shimmer",
+      settings?.assistant_name || "Wai"
+    );
 
     if (registerCallResponse.callId) {
       try {

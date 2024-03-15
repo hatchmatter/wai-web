@@ -39,7 +39,9 @@ const voices: Voice = {
 export const voiceNames = Object.keys(voices) as VoiceName[];
 
 export async function registerCall(
-  voice: VoiceName
+  voice: VoiceName,
+  assistantName?: string,
+  greeting?: string
 ): Promise<RegisterCallResponse> {
   const { agentId } = voices[voice];
   const headers = new Headers();
@@ -50,7 +52,9 @@ export async function registerCall(
     method: "POST",
     headers,
     body: JSON.stringify({
-      agentId
+      agentId,
+      assistantName,
+      greeting
     }),
   });
 
