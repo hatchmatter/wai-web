@@ -83,7 +83,7 @@ function Wai() {
       .eq("id", user?.id)
       .single();
 
-    const registerCallResponse = await registerCall(settings.voice);
+    const registerCallResponse = await registerCall(settings.voice || "shimmer");
 
     if (registerCallResponse.callId) {
       try {
