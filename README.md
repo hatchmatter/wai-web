@@ -55,3 +55,8 @@ Wai is built on Next.js, Supabase, and Stripe. This section will guide you throu
 ## Deployment
 
 The app is hosted on Vercel and is automatically deployed to "staging" on push to the remote `develop` branch. The environment variables are set in the Vercel dashboard. Push to the `main` branch to deploy to production. Supabase migrations run automatically on deployment.
+
+## Seeding
+See [https://supabase.com/docs/guides/cli/seeding-your-database](https://supabase.com/docs/guides/cli/seeding-your-database) for more information on seeding the database.
+
+- `DRY=0 npx tsx seed.mts` to seed the database with test data

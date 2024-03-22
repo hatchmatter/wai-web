@@ -40,6 +40,8 @@
     "zod": "^3.22.2"
   },
   "devDependencies": {
+    "@snaplet/copycat": "^5.0.0",
+    "@snaplet/seed": "^0.89.4",
     "@types/jest": "^29.5.4",
     "@types/mdx": "^2.0.7",
     "@types/node": "^20.5.8",
@@ -49,6 +51,7 @@
     "autoprefixer": "^10.4.15",
     "daisyui": "^3.6.1",
     "postcss": "^8.4.28",
+    "snaplet": "^0.89.4",
     "tailwindcss": "^3.3.3",
     "typescript": "^5.2.2"
   }

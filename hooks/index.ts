@@ -10,6 +10,7 @@ export function useGetUser() {
       const {
         data: { user },
       } = await supabase.auth.getUser();
+
       setUser(user);
     };
 

@@ -2,16 +2,15 @@
 
 import React, { useState, useEffect } from "react";
 import { createClient } from "@/libs/supabase-client";
-import { User } from "@supabase/supabase-js";
 import toast from "react-hot-toast";
 
-import { voiceNames } from "@/libs/wai";
 import { useGetUser } from "@/hooks";
 
 export default function SettingsWai() {
   const supabase = createClient();
   const user = useGetUser();
   const [settings, setSettings] = useState<any>({});
+  const [agents, setAgents] = useState<any[]>([]);
 
   useEffect(() => {
     if (!user) return;
@@ -19,7 +18,7 @@ export default function SettingsWai() {
     const getSettings = async () => {
       const { data, error } = await supabase
         .from("settings")
-        .select("voice, assistant_name")
+        .select("agent_id, assistant_name")
         .eq("id", user?.id)
         .single();
 
@@ -32,6 +31,23 @@ export default function SettingsWai() {
     };
 
     getSettings();
+  }, [supabase, user]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const getAgents = async () => {
+      const { data, error } = await supabase.from("agents").select("*");
+
+      if (error) {
+        console.error("Error fetching agents", error);
+        return;
+      }
+
+      setAgents(data);
+    };
+
+    getAgents();
   }, [supabase, user]);
 
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -94,27 +110,32 @@ export default function SettingsWai() {
             </label>
           </div>
 
-          <div className="col-span-full">
-            <label className="form-control w-full max-w-xs">
-              <div className="label">
-                <span className="label-text">Voice</span>
-              </div>
-              <select
-                className="select select-bordered"
-                name="voice"
-                value={settings?.voice || voiceNames[0]}
-                onChange={(e) =>
-                  setSettings({ ...settings, voice: e.target.value })
-                }
-              >
-                {voiceNames.map((voice) => (
-                  <option key={voice} value={voice}>
-                    {voice}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
+          {agents.length > 0 && (
+            <div className="col-span-full">
+              <label className="form-control w-full max-w-xs">
+                <div className="label">
+                  <span className="label-text">Voice</span>
+                </div>
+                <select
+                  className="select select-bordered"
+                  name="agent_id"
+                  value={
+                    settings?.agent_id ||
+                    agents.find((agent) => agent.name === "Shimmer")?.id
+                  }
+                  onChange={(e) =>
+                    setSettings({ ...settings, agent_id: e.target.value })
+                  }
+                >
+                  {agents.map((agent) => (
+                    <option key={agent.id} value={agent.id}>
+                      {agent.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          )}
           <div>
             <button type="submit" className="btn btn-primary">
               Save
