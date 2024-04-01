@@ -5,12 +5,14 @@ interface RegisterCallResponse {
 
 export async function registerCall(
   agentId: string,
+  accessToken: string,
   assistantName?: string,
-  greeting?: string
+  greeting?: string,
 ): Promise<RegisterCallResponse> {
   const headers = new Headers();
 
   headers.append("Content-Type", "application/json");
+  headers.append("Authorization", `Bearer ${accessToken}`)
 
   const response = await fetch(`${process.env.NEXT_PUBLIC_WSS_URL}/register`, {
     method: "POST",

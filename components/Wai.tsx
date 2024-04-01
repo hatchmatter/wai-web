@@ -82,10 +82,11 @@ function Wai() {
       .select("agent_id, assistant_name")
       .eq("id", user?.id)
       .single();
+    const { data: sessionData } = await supabase.auth.getSession();
 
     const registerCallResponse = await registerCall(
       settings?.agent_id || process.env.NEXT_PUBLIC_DEFAULT_AGENT_ID,
-      settings?.assistant_name || "Wai"
+      sessionData.session.access_token,
     );
 
     if (registerCallResponse.callId) {
