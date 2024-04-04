@@ -69,7 +69,7 @@ function Wai() {
     });
 
     // retell.on("update", (update) => {
-    // prints transcript
+    // // prints transcript
     // console.log("update", update);
     // });
   }, []);
@@ -87,6 +87,7 @@ function Wai() {
     const registerCallResponse = await registerCall(
       settings?.agent_id || process.env.NEXT_PUBLIC_DEFAULT_AGENT_ID,
       sessionData.session.access_token,
+      Intl.DateTimeFormat().resolvedOptions().timeZone,
     );
 
     if (registerCallResponse.callId) {

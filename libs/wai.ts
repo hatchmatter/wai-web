@@ -6,6 +6,7 @@ interface RegisterCallResponse {
 export async function registerCall(
   agentId: string,
   accessToken: string,
+  timezone?: string,
   assistantName?: string,
   greeting?: string,
 ): Promise<RegisterCallResponse> {
@@ -19,6 +20,7 @@ export async function registerCall(
     headers,
     body: JSON.stringify({
       agentId,
+      timezone,
       assistantName,
       greeting
     }),
