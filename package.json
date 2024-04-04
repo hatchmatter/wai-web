@@ -8,7 +8,9 @@
     "build:production": "next build",
     "postbuild": "next-sitemap",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:gentypes": "supabase gen types typescript --local > types/supabase.ts",
+    "db:cptypes": "cp types/supabase.ts ../wai-wss/src/types/supabase.ts"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",

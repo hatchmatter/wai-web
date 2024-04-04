@@ -1,0 +1,1 @@
+alter table public.callers add column preferences jsonb;
