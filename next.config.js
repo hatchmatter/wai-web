@@ -10,6 +10,16 @@ const nextConfig = {
       "logos-world.net",
     ],
   },
+  async redirects() {
+    return [
+      // Basic redirect
+      {
+        source: '/dashboard',
+        destination: '/talk',
+        permanent: false,
+      },
+    ]
+  },
 };
 
 module.exports = nextConfig;

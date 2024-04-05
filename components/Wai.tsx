@@ -50,11 +50,9 @@ function Wai() {
       requestWakeLock();
       setIsCalling(true);
       setIsSettingUp(false);
-      // console.log("conversationStarted");
     });
 
     retell.on("audio", (audio: Uint8Array) => {
-      // console.log("There is audio", audio);
       setAudioData(audio);
     });
 
