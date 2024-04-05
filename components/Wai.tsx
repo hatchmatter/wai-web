@@ -40,6 +40,7 @@ function Wai() {
 
     return () => {
       window.removeEventListener("visibilitychange", handleVisibilityChange);
+      stopMic();
     };
   }, []);
 
