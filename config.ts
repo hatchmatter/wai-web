@@ -6,7 +6,7 @@ const config = {
   appName: "Wai",
   // REQUIRED: a short description of your app for SEO tags (can be overwritten)
   appDescription:
-    "Wai is a safe, friendly, and infinitely patient question answering machine.",
+    "Wai is a safe, friendly, and infinitely patient question answering machine for children.",
   // REQUIRED (no https://, not trialing slash at the end, just the naked domain)
   domainName: "wai.hatchmatter.com",
   crisp: {

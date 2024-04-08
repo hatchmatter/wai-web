@@ -34,14 +34,14 @@ const Footer = () => {
               {config.appDescription}
             </p>
             <p className="mt-3 text-sm text-base-content/60">
-              Copyright © {new Date().getFullYear()} - All rights reserved
+              Copyright © {new Date().getFullYear()} Hatchmatter, LLC - All rights reserved
             </p>
           </div>
           <div className="flex-grow flex flex-wrap justify-center -mb-10 md:mt-0 mt-10 text-center">
             <div className="lg:w-1/3 md:w-1/2 w-full px-4">
-              <div className="footer-title font-semibold text-base-content tracking-widest text-sm md:text-left mb-3">
+              {/* <div className="footer-title font-semibold text-base-content tracking-widest text-sm md:text-left mb-3">
                 LINKS
-              </div>
+              </div> */}
 
               {/* <div className="flex flex-col justify-center items-center md:items-start gap-2 mb-10 text-sm">
                 {config.mailgun.supportEmail && (
@@ -67,9 +67,9 @@ const Footer = () => {
             </div>
 
             <div className="lg:w-1/3 md:w-1/2 w-full px-4">
-              <div className="footer-title font-semibold text-base-content tracking-widest text-sm md:text-left mb-3">
+              {/* <div className="footer-title font-semibold text-base-content tracking-widest text-sm md:text-left mb-3">
                 LEGAL
-              </div>
+              </div> */}
 
               {/* <div className="flex flex-col justify-center items-center md:items-start gap-2 mb-10 text-sm">
                 <Link href="/tos" className="link link-hover">
