@@ -10,24 +10,22 @@ interface VisualizerProps {
   isActive: boolean;
 }
 
-export default function Visualizer({ data, isActive }: VisualizerProps): null {
+export default function Visualizer({ data, isActive }: VisualizerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     if (isActive && canvasRef.current && data) {
-      // processAndDraw(data, canvasRef.current);
+      processAndDraw(data, canvasRef.current);
     }
   }, [isActive, data, canvasRef.current]);
 
-  return null;
-
-  // return (
-  //   <canvas
-  //     ref={canvasRef}
-  //     id="visualizer"
-  //     width="300"
-  //     height="200"
-  //     style={{ aspectRatio: "unset" }}
-  //   ></canvas>
-  // );
+  return (
+    <canvas
+      ref={canvasRef}
+      id="visualizer"
+      width="300"
+      height="200"
+      style={{ aspectRatio: "unset" }}
+    ></canvas>
+  );
 }

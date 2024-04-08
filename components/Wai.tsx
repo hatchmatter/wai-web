@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 import { RetellWebClient } from "retell-client-js-sdk";
 import { useWakeLock } from "react-screen-wake-lock";
+import { debounce } from "lodash";
 
 import { createClient } from "@/libs/supabase-client";
 import { registerCall } from "@/libs/wai";
 import { useGetUser } from "@/hooks";
 
-import Visualizer from "@/components/Visualizer";
+// import Visualizer from "@/components/Visualizer";
 
 if (process.env.NODE_ENV === "production") {
   console.log = () => {};
@@ -20,6 +21,7 @@ function Wai() {
   const user = useGetUser();
   const [isCalling, setIsCalling] = useState<boolean>(false);
   const [isSettingUp, setIsSettingUp] = useState<boolean>(false);
+  const [isAgentTalking, setIsAgentTalking] = useState<boolean>(false);
   const [audioData, setAudioData] = useState<Uint8Array | null>(null);
   const supabase = createClient();
 
@@ -54,6 +56,7 @@ function Wai() {
     });
 
     retell.on("audio", (audio: Uint8Array) => {
+      // console.log("audio", audio)
       setAudioData(audio);
     });
 
@@ -67,11 +70,21 @@ function Wai() {
       setIsCalling(false);
     });
 
-    // retell.on("update", (update) => {
-    // // prints transcript
-    // console.log("update", update);
-    // });
+    retell.on("update", (update) => {
+      const { transcript } = update;
+      // const lastContent = transcript[transcript.length - 1].content;
+      const lastRole = transcript[transcript.length - 1].role;
+
+      if (lastRole === "agent") {
+        setIsAgentTalking(true);
+        handleAgentTalking();
+      }
+    });
   }, []);
+
+  const handleAgentTalking = debounce(() => {
+    setIsAgentTalking(false);
+  }, 800);
 
   const startMic = async () => {
     setIsSettingUp(true);
@@ -86,7 +99,7 @@ function Wai() {
     const registerCallResponse = await registerCall(
       settings?.agent_id || process.env.NEXT_PUBLIC_DEFAULT_AGENT_ID,
       sessionData.session.access_token,
-      Intl.DateTimeFormat().resolvedOptions().timeZone,
+      Intl.DateTimeFormat().resolvedOptions().timeZone
     );
 
     if (registerCallResponse.callId) {
@@ -94,7 +107,7 @@ function Wai() {
         await retell.startConversation({
           callId: registerCallResponse.callId,
           sampleRate: registerCallResponse.sampleRate,
-          // enableUpdate: true,
+          enableUpdate: true,
         });
       } catch (err) {
         console.error("Error starting conversation: ", err);
@@ -115,7 +128,7 @@ function Wai() {
           disabled={isSettingUp}
         >
           {isSettingUp ? (
-            <span className="loading loading-ring loading-lg w-24"></span>
+            <span className="loading loading-infinity loading-lg w-24"></span>
           ) : (
             "Start"
           )}
@@ -125,10 +138,14 @@ function Wai() {
           className="btn btn-circle btn-lg btn-secondary w-36 h-36"
           onClick={stopMic}
         >
-          Stop
+          {isAgentTalking ? (
+            <span className="loading loading-ring loading-lg w-16"></span>
+          ) : (
+            "Stop"
+          )}
         </button>
       )}
-      <Visualizer data={audioData} isActive={isCalling} />
+      {/* <Visualizer data={audioData} isActive={isCalling} /> */}
     </div>
   );
 }
