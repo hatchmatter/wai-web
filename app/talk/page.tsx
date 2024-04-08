@@ -10,7 +10,7 @@ export default async function Dashboard() {
   return (
     <main className="flex flex-col">
       <section className="flex flex-col min-h-[calc(100dvh)] max-w-7xl w-full mx-auto">
-        <header className="flex items-center justify-end p-4 border-b border-gray-200">
+        <header className="flex items-center justify-end p-4">
           <ButtonAccount />
         </header>
 

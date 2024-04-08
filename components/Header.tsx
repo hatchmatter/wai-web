@@ -170,7 +170,6 @@ const Header = () => {
                 ))}
               </div>
             </div>
-            <div className="divider"></div>
             {/* Your CTA on small screens */}
             <div className="flex flex-col">{cta}</div>
           </div>

@@ -23,12 +23,15 @@ const Hero = () => {
         </a> */}
 
         <h1 className="font-extrabold text-4xl lg:text-6xl tracking-tight md:-mb-4">
-          The first kid-friendly AI voice teacher*
+          The first kid-friendly AI assistant
         </h1>
         <p className="text-lg opacity-80 leading-relaxed">
           {config.appDescription}
         </p>
-        <p>*Wai is currently in private beta mode. Join the waitlist to get in the queue for public beta.</p>
+        <p className="font-bold">
+          Wai is currently in private beta mode. Join the waitlist to get in the
+          queue for public beta.
+        </p>
         {/* <button className="btn btn-primary btn-wide">
           Get {config.appName}
         </button> */}
@@ -36,16 +39,16 @@ const Hero = () => {
 
         {/* <TestimonialsAvatars priority={true} /> */}
       </div>
-      {/* <div className="lg:w-full">
+      <div className="lg:w-full">
         <Image
-          src="https://images.unsplash.com/photo-1608562719218-920013a7a249?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          alt="Product Demo"
+          src="/wai-in-garden.jpeg"
+          alt="Wai teaching in a garden"
           className="w-full rounded-xl"
           priority={true}
           width={500}
           height={500}
         />
-      </div> */}
+      </div>
     </section>
   );
 };
