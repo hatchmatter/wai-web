@@ -80,6 +80,8 @@ function Wai() {
         handleAgentTalking();
       }
     });
+
+    window.scrollTo(0, document.body.scrollHeight);
   }, []);
 
   const handleAgentTalking = debounce(() => {
@@ -123,7 +125,7 @@ function Wai() {
     <div className="flex flex-col flex-1 items-center justify-center">
       {!isCalling ? (
         <button
-          className="btn btn-circle btn-lg btn-primary w-36 h-36"
+          className="btn btn-primary w-screen h-screen rounded-none text-2xl"
           onClick={startMic}
           disabled={isSettingUp}
         >
@@ -135,7 +137,7 @@ function Wai() {
         </button>
       ) : (
         <button
-          className="btn btn-circle btn-lg btn-secondary w-36 h-36"
+          className="btn btn-accent w-screen h-screen rounded-none text-2xl"
           onClick={stopMic}
         >
           {isAgentTalking ? (
