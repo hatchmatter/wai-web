@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { RetellWebClient } from "retell-client-js-sdk";
 import { useWakeLock } from "react-screen-wake-lock";
-import { debounce } from "lodash";
+import { debounce, pick, throttle } from "lodash";
 
 import { createClient } from "@/libs/supabase-client";
 import { registerCall } from "@/libs/wai";
@@ -22,10 +22,16 @@ function Wai() {
   const [isCalling, setIsCalling] = useState<boolean>(false);
   const [isSettingUp, setIsSettingUp] = useState<boolean>(false);
   const [isAgentTalking, setIsAgentTalking] = useState<boolean>(false);
-  const [audioData, setAudioData] = useState<Uint8Array | null>(null);
+  // const [audioData, setAudioData] = useState<Uint8Array | null>(null);
+  const [callId, setCallId] = useState<string | null>();
+  const [transcript, setTranscript] = useState<Array<{} | null>>();
   const supabase = createClient();
 
-  const { request: requestWakeLock, release: releaseWakeLock } = useWakeLock({
+  const {
+    request: requestWakeLock,
+    release: releaseWakeLock,
+    released,
+  } = useWakeLock({
     // onRequest: () => console.log("Screen Wake Lock: requested!"),
     onError: (e) => console.error("An error happened 💥", e),
     // onRelease: () => console.log("Screen Wake Lock: released!"),
@@ -46,23 +52,49 @@ function Wai() {
     };
   }, []);
 
-  // Initialize the SDK
   useEffect(() => {
-    // Setup event listeners
+    if (callId && transcript) {
+      saveTranscript(
+        callId,
+        transcript.map((item: any) => pick(item, ["content", "role"]))
+      );
+    }
+  }, [transcript, callId]);
+
+  const saveTranscript = useCallback(
+    throttle(async (callId, transcript) => {
+      try {
+        const { error } = await supabase
+          .from("calls")
+          .update({
+            transcript,
+          })
+          .eq("retell_id", callId);
+
+        if (error) {
+          throw error;
+        }
+      } catch (error) {
+        console.error("Error saving transcript: ", error);
+      }
+    }, 2000),
+    []
+  );
+
+  useEffect(() => {
+    retell.on("conversationEnded", () => {
+      // saveTranscript();
+      setIsCalling(false);
+      // setCallId(null);
+    });
+
     retell.on("conversationStarted", () => {
-      requestWakeLock();
       setIsCalling(true);
       setIsSettingUp(false);
     });
 
     retell.on("audio", (audio: Uint8Array) => {
-      // console.log("audio", audio)
-      setAudioData(audio);
-    });
-
-    retell.on("conversationEnded", ({ code, reason }) => {
-      releaseWakeLock();
-      setIsCalling(false);
+      // setAudioData(audio);
     });
 
     retell.on("error", (error) => {
@@ -71,24 +103,26 @@ function Wai() {
     });
 
     retell.on("update", (update) => {
-      const { transcript } = update;
-      // const lastContent = transcript[transcript.length - 1].content;
-      const lastRole = transcript[transcript.length - 1].role;
+      setTranscript(update.transcript);
 
-      if (lastRole === "agent") {
+      const lastIndex = update.transcript.length - 1;
+      const role = update.transcript[lastIndex].role;
+
+      if (role === "agent") {
         setIsAgentTalking(true);
         handleAgentTalking();
       }
     });
 
     window.scrollTo(0, document.body.scrollHeight);
-  }, []);
+  }, [callId]);
 
   const handleAgentTalking = debounce(() => {
     setIsAgentTalking(false);
   }, 800);
 
   const startMic = async () => {
+    requestWakeLock();
     setIsSettingUp(true);
 
     const { data: settings } = await supabase
@@ -105,6 +139,8 @@ function Wai() {
     );
 
     if (registerCallResponse.callId) {
+      setCallId(registerCallResponse.callId);
+
       try {
         await retell.startConversation({
           callId: registerCallResponse.callId,
@@ -118,6 +154,10 @@ function Wai() {
   };
 
   const stopMic = () => {
+    if (!released) {
+      releaseWakeLock();
+    }
+
     retell.stopConversation();
   };
 
