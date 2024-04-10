@@ -16,7 +16,7 @@ type AccordionItemProps = {
 
 export function AccordionItem({ title, children }: AccordionItemProps) {
   return (
-    <div className="collapse collapse-arrow join-item">
+    <div className="collapse collapse-plus join-item">
       <input type="radio" name="accordion-item" />
       <div className="collapse-title text-lg font-medium">{title}</div>
       <div className="collapse-content">{children}</div>
