@@ -218,7 +218,7 @@ const EditDialog = forwardRef(function EditDialog(
   { caller, onConfirm }: DialogProps,
   ref: React.Ref<HTMLDialogElement>
 ) {
-  const [name, setName] = useState(caller.name);
+  const [name, setName] = useState("");
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
@@ -234,6 +234,7 @@ const EditDialog = forwardRef(function EditDialog(
         <input
           type="text"
           value={name}
+          placeholder={caller.name}
           onChange={handleNameChange}
           className="input input-bordered w-full max-w-xs"
         />
@@ -248,6 +249,7 @@ const EditDialog = forwardRef(function EditDialog(
                 return;
               }
 
+              setName("");
               onConfirm({ ...caller, name })
             }}
           >
