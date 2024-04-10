@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, forwardRef } from "react";
 
 import { createClient } from "@/libs/supabase-client";
 import {
@@ -17,7 +17,9 @@ export default function Callers() {
   const supabase = createClient();
   const [callers, setCallers] = useState([]);
   const [lastCall, setLastCall] = useState(null);
-  const dialogRef = useRef(null);
+  const [selectedCaller, setSelectedCaller] = useState(null);
+  const editDialogRef = useRef(null);
+  const deleteDialogRef = useRef(null);
   const user = useGetUser();
 
   useEffect(() => {
@@ -55,18 +57,40 @@ export default function Callers() {
     }
   }, [user]);
 
-  const handleRemoveCaller = async (callerId: string) => {
+  const handleRemoveCaller = async (caller: any) => {
     const { error } = await supabase
       .from("callers")
       .delete()
-      .eq("id", callerId);
+      .eq("id", caller.id);
 
     if (error) {
       console.error("Error removing caller:", error);
       return;
     }
 
-    setCallers((prev) => prev.filter((c) => c.id !== callerId));
+    setCallers((prev) => prev.filter((c) => c.id !== caller.id));
+  };
+
+  const handleSaveCallerName = async (caller: any) => {
+    const { error } = await supabase
+      .from("callers")
+      .update({ name: caller.name })
+      .eq("id", caller.id);
+
+    if (error) {
+      console.error("Error updating caller name:", error);
+      return;
+    }
+
+    setCallers((prev) =>
+      prev.map((c) => {
+        if (c.id === caller.id) {
+          return { ...c, name: caller.name };
+        }
+
+        return c;
+      })
+    );
   };
 
   const isLastCaller = (callerId: string) => {
@@ -85,6 +109,7 @@ export default function Callers() {
         <Accordion>
           {callers.map((caller) => (
             <AccordionItem
+              onClick={() => setSelectedCaller(caller)}
               key={caller.id}
               title={
                 <div className="flex items-center justify-between">
@@ -101,18 +126,47 @@ export default function Callers() {
               }
             >
               <div className="mt-2">
-                <p className="text-sm font-semibold leading-6">Preferences</p>
-                <div className="mt-1 truncate text-xs leading-5">
-                  {Object.keys(caller.preferences || []).map((p) => {
-                    return <p key={p}>{`${p}: ${caller.preferences[p]}`}</p>;
-                  })}
-                </div>
+                {caller.preferences && (
+                  <>
+                    <p className="text-sm font-semibold leading-6">
+                      Preferences
+                    </p>
+                    <div className="mt-1 truncate text-xs leading-5">
+                      {Object.keys(caller.preferences).map((p) => {
+                        return (
+                          <p key={p}>{`${p}: ${caller.preferences[p]}`}</p>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
                 <div>
-                  <div className="mt-10 flex justify-end">
+                  <div className="mt-4 flex justify-end gap-4">
+                    <button
+                      className=""
+                      onClick={() => {
+                        editDialogRef.current?.showModal();
+                      }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-4 h-4"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
+                        />
+                      </svg>
+                    </button>
                     <button
                       className="text-red-400"
                       onClick={() => {
-                        dialogRef.current?.showModal();
+                        deleteDialogRef.current?.showModal();
                       }}
                     >
                       <svg
@@ -130,27 +184,6 @@ export default function Callers() {
                         />
                       </svg>
                     </button>
-                    <Dialog ref={dialogRef}>
-                      <div className="modal-content">
-                        <h3 className="font-bold text-lg">
-                          Remove {caller.name}
-                        </h3>
-                        <p className="py-4">
-                          Are you sure you want to remove <b>{caller.name}</b>? This action cannot be undone and you will lose their data. You can also simply change their name.
-                        </p>
-                      </div>
-                      <div className="modal-action">
-                        <form method="dialog" className="flex gap-x-2">
-                          <button className="btn btn-sm btn-primary">Cancel</button>
-                          <button
-                            className="btn btn-sm"
-                            onClick={() => handleRemoveCaller(caller.id)}
-                          >
-                            Confirm
-                          </button>
-                        </form>
-                      </div>
-                    </Dialog>
                   </div>
                 </div>
               </div>
@@ -158,6 +191,96 @@ export default function Callers() {
           ))}
         </Accordion>
       </SectionContent>
+      {selectedCaller && (
+        <>
+          <EditDialog
+            ref={editDialogRef}
+            caller={selectedCaller}
+            onConfirm={handleSaveCallerName}
+          />
+          <DeleteDialog
+            ref={deleteDialogRef}
+            caller={selectedCaller}
+            onConfirm={handleRemoveCaller}
+          />
+        </>
+      )}
     </Section>
   );
 }
+
+type DialogProps = {
+  caller: any;
+  onConfirm: (caller: any) => void;
+};
+
+const EditDialog = forwardRef(function EditDialog(
+  { caller, onConfirm }: DialogProps,
+  ref: React.Ref<HTMLDialogElement>
+) {
+  const [name, setName] = useState(caller.name);
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setName(e.target.value);
+  };
+
+  return (
+    <Dialog ref={ref}>
+      <div className="modal-content">
+        <h3 className="font-bold text-lg">Edit person</h3>
+        <p className="py-4">
+          Name
+        </p>
+        <input
+          type="text"
+          value={name}
+          onChange={handleNameChange}
+          className="input input-bordered w-full max-w-xs"
+        />
+      </div>
+      <div className="modal-action">
+        <form method="dialog" className="flex gap-x-2">
+          <button className="btn btn-sm">Cancel</button>
+          <button
+            className="btn btn-sm btn-primary"
+            onClick={() => {
+              if (name.trim() === "") {
+                return;
+              }
+
+              onConfirm({ ...caller, name })
+            }}
+          >
+            Save
+          </button>
+        </form>
+      </div>
+    </Dialog>
+  );
+});
+
+const DeleteDialog = forwardRef(function DeleteDialog(
+  { caller, onConfirm }: DialogProps,
+  ref: React.Ref<HTMLDialogElement>
+) {
+  return (
+    <Dialog ref={ref}>
+      <div className="modal-content">
+        <h3 className="font-bold text-lg text-error">Remove {caller.name}</h3>
+        <p className="py-4">
+          Are you sure you want to remove <b>{caller.name}</b>? This action
+          cannot be undone and you will lose their data. You can also simply
+          change their name.
+        </p>
+      </div>
+      <div className="modal-action">
+        <form method="dialog" className="flex gap-x-2">
+          <button className="btn btn-sm btn-primary">Cancel</button>
+          <button className="btn btn-sm" onClick={() => onConfirm(caller)}>
+            Confirm
+          </button>
+        </form>
+      </div>
+    </Dialog>
+  );
+});
