@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { createClient } from "@/libs/supabase-client";
 import toast from "react-hot-toast";
 
+import { Section, SectionDescription, SectionContent } from "@/components/ui/Section";
 import { useGetUser } from "@/hooks";
 
 export default function SettingsWai() {
@@ -82,15 +83,15 @@ export default function SettingsWai() {
   };
 
   return (
-    <div className="grid grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8">
-      <div>
+    <Section>
+      <SectionDescription>
         <h2 className="text-base font-semibold leading-7">Wai Info</h2>
         <p className="mt-1 text-sm leading-6 ">
           Customize Wai&apos;s name and voice.
         </p>
-      </div>
-
-      <form className="md:col-span-2" onSubmit={handleSave}>
+      </SectionDescription>
+      <SectionContent>  
+      <form onSubmit={handleSave}>
         <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
           <div className="sm:col-span-3">
             <label className="form-control w-full max-w-xs">
@@ -143,6 +144,7 @@ export default function SettingsWai() {
           </div>
         </div>
       </form>
-    </div>
+      </SectionContent>
+    </Section>
   );
 }

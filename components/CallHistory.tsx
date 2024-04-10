@@ -4,7 +4,13 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/libs/supabase-client";
 import { format } from "date-fns";
 
-import { Accordion, AccordionItem } from "./ui/Accordion";
+import {
+  Accordion,
+  AccordionItem,
+  Section,
+  SectionContent,
+  SectionDescription,
+} from "@/components/ui";
 import { useGetUser } from "@/hooks";
 
 export default function CallHistory() {
@@ -36,46 +42,48 @@ export default function CallHistory() {
   }, [user]);
 
   return (
-    <div className="grid grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3">
-      <div className="col-span-1">
+    <Section>
+      <SectionDescription>
         <h2 className="text-base font-semibold leading-7">
           Conversation History
         </h2>
         <p className="mt-1 text-sm leading-6 ">
           Review past conversations with Wai.
         </p>
-      </div>
-      <Accordion className="col-span-2">
-        {calls.map((call) => (
-          <AccordionItem
-            key={call.id}
-            title={`${format(new Date(call.created_at), "PPpp")} with ${call.callers.map((caller: any) => caller.name).join(", ")}`}
-          >
-            <div>
-              <div className="py-4">
-                <audio
-                  className="w-full h-6"
-                  controls
-                  preload="metadata"
-                  src={`https://dxc03zgurdly9.cloudfront.net/${call.retell_id}/recording.wav`}
-                  title={`Recording of conversation with ${call.callers.map((caller: any) => caller.name).join(", ")} on ${format(new Date(call.created_at), "PPpp")}`}
-                >
-                  <p>
-                    Your browser does not support the <code>audio</code>{" "}
-                    element.
-                  </p>
-                </audio>
+      </SectionDescription>
+      <SectionContent>
+        <Accordion>
+          {calls.map((call) => (
+            <AccordionItem
+              key={call.id}
+              title={`${format(new Date(call.created_at), "PPpp")} with ${call.callers.map((caller: any) => caller.name).join(", ")}`}
+            >
+              <div>
+                <div className="py-4">
+                  {process.env.NODE_ENV !== 'development' ? (<audio
+                    className="w-full h-6"
+                    controls
+                    preload="metadata"
+                    src={`https://dxc03zgurdly9.cloudfront.net/${call.retell_id}/recording.wav`}
+                    title={`Recording of conversation with ${call.callers.map((caller: any) => caller.name).join(", ")} on ${format(new Date(call.created_at), "PPpp")}`}
+                  >
+                    <p>
+                      Your browser does not support the <code>audio</code>{" "}
+                      element.
+                    </p>
+                  </audio>) : "no audio in dev"}
+                </div>
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: formatTranscript(call.transcript),
+                  }}
+                />
               </div>
-              <p
-                dangerouslySetInnerHTML={{
-                  __html: formatTranscript(call.transcript),
-                }}
-              />
-            </div>
-          </AccordionItem>
-        ))}
-      </Accordion>
-    </div>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </SectionContent>
+    </Section>
   );
 }
 
