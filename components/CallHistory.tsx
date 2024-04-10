@@ -48,6 +48,7 @@ export default function CallHistory() {
       <Accordion className="col-span-2">
         {calls.map((call) => (
           <AccordionItem
+            key={call.id}
             title={`${format(new Date(call.created_at), "PPpp")} with ${call.callers.map((caller: any) => caller.name).join(", ")}`}
           >
             <div>

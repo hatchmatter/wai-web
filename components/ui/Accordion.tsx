@@ -1,3 +1,5 @@
+import React from 'react';
+
 type AccordionProps = {
   children: React.ReactNode;
   className?: string;
