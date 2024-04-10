@@ -52,17 +52,20 @@ export default function CallHistory() {
             title={`${format(new Date(call.created_at), "PPpp")} with ${call.callers.map((caller: any) => caller.name).join(", ")}`}
           >
             <div>
-              <audio
-                className="py-4 w-full"
-                controls
-                preload="metadata"
-                src={`https://dxc03zgurdly9.cloudfront.net/${call.retell_id}/recording.wav`}
-                title={`Recording of conversation with ${call.callers.map((caller: any) => caller.name).join(", ")} on ${format(new Date(call.created_at), "PPpp")}`}
-              >
-                <p>
-                  Your browser does not support the <code>audio</code> element.
-                </p>
-              </audio>
+              <div className="py-4">
+                <audio
+                  className="w-full h-6"
+                  controls
+                  preload="metadata"
+                  src={`https://dxc03zgurdly9.cloudfront.net/${call.retell_id}/recording.wav`}
+                  title={`Recording of conversation with ${call.callers.map((caller: any) => caller.name).join(", ")} on ${format(new Date(call.created_at), "PPpp")}`}
+                >
+                  <p>
+                    Your browser does not support the <code>audio</code>{" "}
+                    element.
+                  </p>
+                </audio>
+              </div>
               <p
                 dangerouslySetInnerHTML={{
                   __html: formatTranscript(call.transcript),
