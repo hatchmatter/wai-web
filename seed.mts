@@ -17,7 +17,7 @@ const seed = await createSeedClient({
 });
 
 // Clears all existing data in the database, but keep the structure
-await seed.$resetDatabase()
+// await seed.$resetDatabase()
 
 
 await seed.agents([
