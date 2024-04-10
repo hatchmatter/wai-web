@@ -1,3 +1,5 @@
+import React from 'react';
+
 type SectionProps = {
   children: React.ReactNode;
 };

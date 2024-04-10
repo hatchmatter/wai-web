@@ -12,7 +12,6 @@ import {
   Dialog,
 } from "@/components/ui";
 import { useGetUser } from "@/hooks";
-import { update } from "lodash";
 
 export default function Callers() {
   const supabase = createClient();
@@ -79,7 +78,7 @@ export default function Callers() {
       <SectionDescription>
         <h2 className="text-base font-semibold leading-7">People</h2>
         <p className="mt-1 text-sm leading-6">
-          View and edit previous people who've spoken to Wai.
+          View and edit previous people who&apos;ve spoken to Wai.
         </p>
       </SectionDescription>
       <SectionContent>
