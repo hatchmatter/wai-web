@@ -21,7 +21,7 @@ const ButtonLead = ({ extraStyle }: { extraStyle?: string }) => {
     try {
       await apiClient.post("/lead", { email });
 
-      toast.success("Thanks for joining the waitlist!");
+      toast.success("Thanks for joining the waitlist! We'll be in touch soon.");
 
       // just remove the focus on the input
       inputRef.current.blur();

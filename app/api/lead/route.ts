@@ -15,9 +15,22 @@ export async function POST(req: NextRequest) {
     const cookieStore = cookies();
     const supabase = createClient(cookieStore);
 
-    await supabase.from("leads").insert({ email: body.email });
+    const { error } = await supabase
+      .from("leads")
+      .insert({ email: body.email });
 
-    return NextResponse.json({});
+    if (error) {
+      console.error("Error inserting lead:", error);
+      return NextResponse.json(
+        {
+          error:
+            "There was a problem adding your email. You may have already signed up using this email address.",
+        },
+        { status: 409 }
+      );
+    }
+
+    return NextResponse.json({}, { status: 201 });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: e.message }, { status: 500 });
