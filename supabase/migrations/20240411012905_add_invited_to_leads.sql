@@ -1,0 +1,1 @@
+alter table public.leads add column invited boolean not null default false;
