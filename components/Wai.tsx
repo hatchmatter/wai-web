@@ -3,13 +3,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { RetellWebClient } from "retell-client-js-sdk";
 import { useWakeLock } from "react-screen-wake-lock";
-import { debounce, pick, throttle } from "lodash";
+import { debounce, pick, throttle, update } from "lodash";
 
 import { createClient } from "@/libs/supabase-client";
 import { registerCall } from "@/libs/wai";
 import { useGetUser } from "@/hooks";
 
-// import Visualizer from "@/components/Visualizer";
+import Visualizer from "@/components/Visualizer";
 
 if (process.env.NODE_ENV === "production") {
   console.log = () => {};
@@ -22,7 +22,7 @@ function Wai() {
   const [isCalling, setIsCalling] = useState<boolean>(false);
   const [isSettingUp, setIsSettingUp] = useState<boolean>(false);
   const [isAgentTalking, setIsAgentTalking] = useState<boolean>(false);
-  // const [audioData, setAudioData] = useState<Uint8Array | null>(null);
+  const [audioData, setAudioData] = useState<Uint8Array | null>(null);
   const [callId, setCallId] = useState<string | null>();
   const [transcript, setTranscript] = useState<Array<{} | null>>();
   const supabase = createClient();
@@ -61,6 +61,29 @@ function Wai() {
     }
   }, [transcript, callId]);
 
+  useEffect(() => {
+    retell.on("conversationEnded", () => {
+      // saveTranscript();
+      setIsCalling(false);
+      // setCallId(null);
+    });
+
+    retell.on("conversationStarted", () => {
+      setIsCalling(true);
+      setIsSettingUp(false);
+    });
+
+    retell.on("audio", updateAudioData);
+    retell.on("update", updateTranscript);
+
+    retell.on("error", (error) => {
+      console.error("An error occurred:", error);
+      setIsCalling(false);
+    });
+
+    window.scrollTo(0, document.body.scrollHeight);
+  }, [callId]);
+
   const saveTranscript = useCallback(
     throttle(async (callId, transcript) => {
       try {
@@ -81,41 +104,21 @@ function Wai() {
     []
   );
 
-  useEffect(() => {
-    retell.on("conversationEnded", () => {
-      // saveTranscript();
-      setIsCalling(false);
-      // setCallId(null);
-    });
+  const updateAudioData = useCallback((data: Uint8Array) => {
+    setAudioData(data);
+  }, []);
 
-    retell.on("conversationStarted", () => {
-      setIsCalling(true);
-      setIsSettingUp(false);
-    });
+  const updateTranscript = useCallback((data: any) => {
+    setTranscript(data.transcript);
 
-    retell.on("audio", (audio: Uint8Array) => {
-      // setAudioData(audio);
-    });
-
-    retell.on("error", (error) => {
-      console.error("An error occurred:", error);
-      setIsCalling(false);
-    });
-
-    retell.on("update", (update) => {
-      setTranscript(update.transcript);
-
-      const lastIndex = update.transcript.length - 1;
-      const role = update.transcript[lastIndex].role;
+      const lastIndex = data.transcript.length - 1;
+      const role = data.transcript[lastIndex].role;
 
       if (role === "agent") {
         setIsAgentTalking(true);
         handleAgentTalking();
       }
-    });
-
-    window.scrollTo(0, document.body.scrollHeight);
-  }, [callId]);
+  }, []);
 
   const handleAgentTalking = debounce(() => {
     setIsAgentTalking(false);
@@ -162,7 +165,7 @@ function Wai() {
   };
 
   return (
-    <div className="flex flex-col flex-1 items-center justify-center">
+    <div className="flex flex-col flex-1 items-center justify-center mb-10">
       {!isCalling ? (
         <button
           className="btn btn-primary w-screen h-screen rounded-none text-2xl"
@@ -180,14 +183,11 @@ function Wai() {
           className="btn btn-accent w-screen h-screen rounded-none text-2xl"
           onClick={stopMic}
         >
-          {isAgentTalking ? (
-            <span className="loading loading-ring loading-lg w-16"></span>
-          ) : (
-            "Stop"
+          {isAgentTalking && (
+            <Visualizer data={audioData} isActive={isCalling} />
           )}
         </button>
       )}
-      {/* <Visualizer data={audioData} isActive={isCalling} /> */}
     </div>
   );
 }
