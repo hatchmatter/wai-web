@@ -7,7 +7,7 @@ Wai is built on Next.js, Supabase, and Stripe. This section will guide you throu
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/en/)
-- [Stripe CLI](https://stripe.com/docs/stripe-cli)
+- [Stripe CLI](https://stripe.com/docs/stripe-cli) (optional)
 - [Docker](https://www.docker.com/products/docker-desktop)
 - [Supabase CLI](https://supabase.io/docs/guides/cli) (you'll need a supabase dev account)
 
@@ -15,14 +15,19 @@ Wai is built on Next.js, Supabase, and Stripe. This section will guide you throu
 
 - Get `.env.local` file from your friendly neighborhood developer
 - Install docker desktop from [here](https://www.docker.com/products/docker-desktop)
-- Install supabase cli with `brew install supabase/tap/supabase`
-- Install stripe cli with `brew install stripe/stripe-cli/stripe`
+- Install supabase cli with `brew install supabase/tap/supabase` or with Scoop on Windows
+```
+scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+scoop install supabase
+```
+- Install stripe cli with `brew install stripe/stripe-cli/stripe` (optional)
 - Run `npm install` to install the dependencies
 
 ### Running the app
 
 - Run `supabase start` to start the local supabase server
 - Run `npm run dev` to start the development server
+- Start the Wai Web Socket Server (see below)
 - Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ### Stripe
@@ -43,14 +48,21 @@ Wai is built on Next.js, Supabase, and Stripe. This section will guide you throu
 
 ### Emails
 
-- Check transactional emails at [http://127.0.0.1:54324/](http://127.0.0.1:54324/)
+- Check transactional emails like login links at [http://127.0.0.1:54324/](http://127.0.0.1:54324/)
 
 ### Wai Web Socket Server
 
 - Wai runs in on heroku, but you can run it locally for development using instructions below
 - To test Wai locally, ensure the WSS is running (see repo for instructions)
-- Run ngrok to expose the WSS to the internet `ngrok http 8080`
+- Run ngrok to expose the WSS to the internet `ngrok http 8080` You'll need to set up an [ngrok](https://ngrok.com/) account and set a custom domain if you don't want to have to update the `NEXT_PUBLIC_WSS_URL` in the `.env.local` file every time you start ngrok
 - And, update the `NEXT_PUBLIC_WSS_URL` in the `.env.local` file to the ngrok https URL
+
+## Development Workflow
+- Create a new branch off of `develop` for your feature
+- Push your branch to the remote
+- Create a pull request to `develop`
+- Merge your pull request
+- Delete your branch
 
 ## Deployment
 
