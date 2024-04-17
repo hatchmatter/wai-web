@@ -7,8 +7,7 @@ export async function registerCall(
   agentId: string,
   accessToken: string,
   timezone?: string,
-  assistantName?: string,
-  greeting?: string,
+  callerId?: string
 ): Promise<RegisterCallResponse> {
   const headers = new Headers();
 
@@ -21,8 +20,7 @@ export async function registerCall(
     body: JSON.stringify({
       agentId,
       timezone,
-      assistantName,
-      greeting
+      callerId
     }),
   });
 
