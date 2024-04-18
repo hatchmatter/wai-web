@@ -52,6 +52,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(callDetail);
   } catch (e) {
     console.error(e);
-    return NextResponse.json({ error: "Failed to register call" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to register call" },
+      { status: 500 }
+    );
   }
-};
+}
