@@ -38,7 +38,7 @@
     "react-screen-wake-lock": "^3.0.2",
     "react-syntax-highlighter": "^15.5.0",
     "react-tooltip": "^5.21.1",
-    "retell-client-js-sdk": "1.2.1",
+    "retell-client-js-sdk": "1.3.2",
     "retell-sdk": "2.3.1",
     "stripe": "^13.2.0",
     "zod": "^3.22.2"
