@@ -12,9 +12,8 @@ export async function registerCall(
   const headers = new Headers();
 
   headers.append("Content-Type", "application/json");
-  headers.append("Authorization", `Bearer ${accessToken}`)
 
-  const response = await fetch(`${process.env.NEXT_PUBLIC_WSS_URL}/register`, {
+  const response = await fetch(`/api/call/register`, {
     method: "POST",
     headers,
     body: JSON.stringify({
