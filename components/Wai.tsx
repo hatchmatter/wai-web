@@ -17,7 +17,11 @@ if (process.env.NODE_ENV === "production") {
 
 const retell = new RetellWebClient();
 
-function Wai() {
+type WaiProps = { 
+  callerId: string
+}
+
+function Wai({callerId}: WaiProps) {
   const user = useGetUser();
   const [isCalling, setIsCalling] = useState<boolean>(false);
   const [isSettingUp, setIsSettingUp] = useState<boolean>(false);
@@ -135,8 +139,8 @@ function Wai() {
     const registerCallResponse = await registerCall(
       settings?.agent_id || process.env.NEXT_PUBLIC_DEFAULT_AGENT_ID,
       sessionData.session.access_token,
-      Intl.DateTimeFormat().resolvedOptions().timeZone
-      // TODO: add callerId here
+      Intl.DateTimeFormat().resolvedOptions().timeZone,
+      callerId
     );
 
     if (registerCallResponse.callId) {
