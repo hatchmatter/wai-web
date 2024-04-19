@@ -1,5 +1,8 @@
 # WAI Web
 
+## Architecture
+[Diagram](https://s.icepanel.io/W7ywJJ89DYtzBE/50WS)
+
 ## Development
 
 Wai is built on Next.js, Supabase, and Stripe. This section will guide you through setting up your development environment.
