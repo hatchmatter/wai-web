@@ -50,15 +50,12 @@ scoop install supabase
   - After resetting you'll have to create a new user via the supabase admin interface [http://127.0.0.1:54323](http://127.0.0.1:54323/)
 
 ### Emails
-
 - Check transactional emails like login links at [http://127.0.0.1:54324/](http://127.0.0.1:54324/)
 
 ### Wai Web Socket Server
-
-- Wai runs in on heroku, but you can run it locally for development using instructions below
+- `wai-wss` runs in on heroku, but you can run it locally for development using instructions below
 - To test Wai locally, ensure the WSS is running (see repo for instructions)
-- Run ngrok to expose the WSS to the internet `ngrok http 8080` You'll need to set up an [ngrok](https://ngrok.com/) account and set a custom domain if you don't want to have to update the `NEXT_PUBLIC_WSS_URL` in the `.env.local` file every time you start ngrok
-- And, update the `NEXT_PUBLIC_WSS_URL` in the `.env.local` file to the ngrok https URL
+- Run ngrok to expose the WSS to the internet `ngrok http 8080` You'll need to set up an [ngrok](https://ngrok.com/) account and set a custom domain. Once you've done that, add the ngrok url to the retellai.com dashboard for every agent being used.
 
 ## Development Workflow
 - Create a new branch off of `develop` for your feature
@@ -68,7 +65,6 @@ scoop install supabase
 - Delete your branch
 
 ## Deployment
-
 The app is hosted on Vercel and is automatically deployed to "staging" on push to the remote `develop` branch. The environment variables are set in the Vercel dashboard. Push to the `main` branch to deploy to production. Supabase migrations run automatically on deployment.
 
 ## Seeding
