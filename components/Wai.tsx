@@ -6,7 +6,7 @@ import { useWakeLock } from "react-screen-wake-lock";
 import { debounce, pick, throttle } from "lodash";
 
 import { createClient } from "@/libs/supabase-client";
-import { registerCall } from "@/libs/wai";
+import { registerCall, healthCheck } from "@/libs/wai";
 import { useGetUser } from "@/hooks";
 
 // import Visualizer from "@/components/Visualizer";
@@ -40,6 +40,19 @@ function Wai({callerId}: WaiProps) {
     onError: (e) => console.error("An error happened 💥", e),
     // onRelease: () => console.log("Screen Wake Lock: released!"),
   });
+
+  // This is used to wake the heroku server on the first load
+  useEffect(() => {
+    const pingServer = async () => {
+      try {
+        await healthCheck();
+      } catch (error) {
+        console.error("Error pinging server: ", error);
+      }
+    };
+
+    pingServer();
+  }, []);
 
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -134,13 +147,10 @@ function Wai({callerId}: WaiProps) {
       .select("agent_id, assistant_name")
       .eq("id", user?.id)
       .single();
-    const { data: sessionData } = await supabase.auth.getSession();
 
     const registerCallResponse = await registerCall(
       settings?.agent_id || process.env.NEXT_PUBLIC_DEFAULT_AGENT_ID,
-      sessionData.session.access_token,
-      Intl.DateTimeFormat().resolvedOptions().timeZone,
-      callerId
+      Intl.DateTimeFormat().resolvedOptions().timeZone
     );
 
     if (registerCallResponse.callId) {
