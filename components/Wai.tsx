@@ -17,7 +17,11 @@ if (process.env.NODE_ENV === "production") {
 
 const retell = new RetellWebClient();
 
-function Wai() {
+type WaiProps = { 
+  callerId: string
+}
+
+function Wai({callerId}: WaiProps) {
   const user = useGetUser();
   const [isCalling, setIsCalling] = useState<boolean>(false);
   const [isSettingUp, setIsSettingUp] = useState<boolean>(false);

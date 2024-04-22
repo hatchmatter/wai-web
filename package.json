@@ -9,6 +9,7 @@
     "postbuild": "next-sitemap",
     "start": "next start",
     "lint": "next lint",
+    "db:seed:win": "set DRY=0&& npx tsx seed.mts",
     "db:seed": "DRY=0 npx tsx seed.mts",
     "db:gentypes": "supabase gen types typescript --local > types/supabase.ts",
     "db:cptypes": "cp types/supabase.ts ../wai-wss/src/types/supabase.ts"
