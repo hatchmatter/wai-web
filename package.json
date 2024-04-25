@@ -33,6 +33,7 @@
     "next-sitemap": "^4.2.2",
     "nextjs-toploader": "^1.4.2",
     "nodemailer": "^6.9.4",
+    "openai": "^4.38.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hot-toast": "^2.4.1",
@@ -40,7 +41,7 @@
     "react-syntax-highlighter": "^15.5.0",
     "react-tooltip": "^5.21.1",
     "retell-client-js-sdk": "1.3.2",
-    "retell-sdk": "3.6.0",
+    "retell-sdk": "3.8.0",
     "stripe": "^13.2.0",
     "zod": "^3.22.2"
   },
