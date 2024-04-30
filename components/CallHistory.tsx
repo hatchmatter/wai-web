@@ -25,7 +25,6 @@ export default function CallHistory() {
         .select("*, callers!callers_calls(*)")
         .not("transcript", "is", null)
         .order("created_at", { ascending: false })
-        // .limit(10)
         .eq("user_id", user?.id);
 
       if (error) {
@@ -60,22 +59,31 @@ export default function CallHistory() {
             >
               <div>
                 <div className="py-4">
-                  {process.env.NODE_ENV !== 'development' ? (<audio
-                    className="w-full h-6"
-                    controls
-                    preload="metadata"
-                    src={`https://dxc03zgurdly9.cloudfront.net/${call.retell_id}/recording.wav`}
-                    title={`Recording of conversation with ${call.callers.map((caller: any) => caller.name).join(", ")} on ${format(new Date(call.created_at), "PPpp")}`}
-                  >
-                    <p>
-                      Your browser does not support the <code>audio</code>{" "}
-                      element.
-                    </p>
-                  </audio>) : "no audio in dev"}
+                  {process.env.NODE_ENV !== "development" || call.audio_url ? (
+                    <audio
+                      className="w-full h-6"
+                      controls
+                      preload="metadata"
+                      src={
+                        call.audio_url ||
+                        `https://dxc03zgurdly9.cloudfront.net/${call.retell_id}/recording.wav`
+                      }
+                      title={`Recording of conversation with ${call.callers.map((caller: any) => caller.name).join(", ")} on ${format(new Date(call.created_at), "PPpp")}`}
+                    >
+                      <p>
+                        Your browser does not support the <code>audio</code>{" "}
+                        element.
+                      </p>
+                    </audio>
+                  ) : (
+                    "no audio in dev"
+                  )}
                 </div>
                 <p
                   dangerouslySetInnerHTML={{
-                    __html: formatTranscript(call.transcript),
+                    __html:
+                      call.transcript_text?.replaceAll("\n", "<br />") ||
+                      formatTranscript(call.transcript),
                   }}
                 />
               </div>
@@ -88,12 +96,14 @@ export default function CallHistory() {
 }
 
 function formatTranscript(transcript: any) {
-  const formatted = transcript
-    ?.map((t: any) => {
-      return `<b>${t.role}</b>: ${t.content}\n`;
-    })
-    .filter(Boolean)
-    .join("<br />");
+  if (transcript) {
+    const formatted = transcript
+      ?.map((t: any) => {
+        return `<b>${t.role}</b>: ${t.content}\n`;
+      })
+      .filter(Boolean)
+      .join("<br />");
 
-  return formatted;
+    return formatted;
+  }
 }
