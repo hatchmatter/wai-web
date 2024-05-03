@@ -1,19 +1,19 @@
 "use client";
 
-import React, { RefObject } from "react";
+import React, { useRef, useEffect } from "react";
 
 import { AudioInfo } from "@/components/SettingsWai";
 
-type ButtonPreviewProps = {
+type AudioPlayerProps = {
   agentId: string;
-  agentName: string;
-  audioInfo: AudioInfo;
-  setAudioInfo: (info: AudioInfo) => void;
-  cleanAudio: () => void;
-  audioRef: RefObject<HTMLAudioElement>;
+  audioPath: string;
+  playbackState: AudioInfo;
+  onChangePlaybackState: (info: AudioInfo) => void;
 };
 
-const ButtonVoicePreview = ({ agentId, agentName, audioInfo, setAudioInfo, cleanAudio, audioRef }: ButtonPreviewProps) => {
+const AudioPlayer = ({ agentId, audioPath, playbackState, onChangePlaybackState }: AudioPlayerProps) => {
+  const audioRef = useRef(null);
+  
   const playButton = (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -36,19 +36,41 @@ const ButtonVoicePreview = ({ agentId, agentName, audioInfo, setAudioInfo, clean
     </svg>
   );
 
-  const stopAudio = () => {
-    cleanAudio();
-    setAudioInfo({ isPlaying: false, agentId: "", src: "" });
+  // clean up audio on dismount
+  useEffect(() => {
+    return () => {
+      cleanUpAudio();
+    };
+  }, [])
+
+  // cleans up audio if it should no longer be running (audio was switched)
+  useEffect(() => {
+    if (playbackState.isPlaying && agentId !== playbackState.id) {
+      cleanUpAudio();
+    }
+  }, [playbackState])
+
+  const cleanUpAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = "";
+      audioRef.current.load();
+    }
   };
 
-  const playAudio = (id: string, name: string) => {
-    if (audioInfo.isPlaying && audioInfo.agentId === id) {
+  const stopAudio = () => {
+    cleanUpAudio();
+    onChangePlaybackState({ isPlaying: false, id: ""});
+  };
+
+  const playAudio = (agentId: string, path: string) => {
+    if (playbackState.isPlaying && playbackState.id === agentId) {
       stopAudio();
     } else {
-      setAudioInfo({ isPlaying: true, agentId: id, src: `/audio/${name}.wav` });
+      onChangePlaybackState({ isPlaying: true, id: agentId });
       if (audioRef.current) {
         audioRef.current.pause();
-        audioRef.current.src = audioInfo.src;
+        audioRef.current.src = path;
         audioRef.current.load();
         audioRef.current.onloadeddata = () => {
           audioRef.current.play();
@@ -63,16 +85,16 @@ const ButtonVoicePreview = ({ agentId, agentName, audioInfo, setAudioInfo, clean
         <button
           type="button"
           className="icon-button"
-          onClick={() => playAudio(agentId, agentName)}
+          onClick={() => playAudio(agentId, audioPath)}
         >
-          {audioInfo.isPlaying && audioInfo.agentId === agentId
+          {playbackState.isPlaying && playbackState.id === agentId
             ? pauseButton
             : playButton}
         </button>
-        {audioInfo.isPlaying && (
+        {playbackState.isPlaying && (
           <audio
             ref={audioRef}
-            src={audioInfo.src}
+            src={audioPath}
             onLoadedData={() => {
               audioRef.current.play();
             }}
@@ -84,4 +106,4 @@ const ButtonVoicePreview = ({ agentId, agentName, audioInfo, setAudioInfo, clean
   );
 };
 
-export default ButtonVoicePreview;
+export default AudioPlayer;

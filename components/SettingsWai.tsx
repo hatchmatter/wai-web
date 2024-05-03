@@ -6,12 +6,11 @@ import toast from "react-hot-toast";
 
 import { Section, SectionDescription, SectionContent } from "@/components/ui/Section";
 import { useGetUser } from "@/hooks";
-import ButtonVoicePreview from "@/components/ButtonVoicePreview";
+import AudioPlayer from "@/components/AudioPlayer";
 
 export type AudioInfo = {
   isPlaying: boolean;
-  agentId: string;
-  src: string;
+  id: string;
 }
 
 export default function SettingsWai() {
@@ -19,23 +18,7 @@ export default function SettingsWai() {
   const user = useGetUser();
   const [settings, setSettings] = useState<any>({});
   const [agents, setAgents] = useState<any[]>([]);
-  const [audioInfo, setAudioInfo] = useState<AudioInfo>({ isPlaying: false, agentId: "", src: ""});
-  const audioRef = useRef(null);
-  
-  // clean up audio on dismount
-  useEffect(() => {
-    return () => {
-      cleanUpAudio();
-    };
-  }, [])
-
-  const cleanUpAudio = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.src = "";
-      audioRef.current.load();
-    }
-  };
+  const [audioPlaybackState, setAudioPlaybackState] = useState<AudioInfo>({ isPlaying: false, id: "" });
 
   useEffect(() => {
     if (!user) return;
@@ -159,13 +142,11 @@ export default function SettingsWai() {
                             {agent.name}
                         </label>
                       </div>
-                      <ButtonVoicePreview
+                      <AudioPlayer
                         agentId={agent.id}
-                        agentName={agent.name}
-                        audioInfo={audioInfo}
-                        setAudioInfo={setAudioInfo}
-                        cleanAudio={cleanUpAudio}
-                        audioRef={audioRef}
+                        audioPath={`/audio/${agent.name}.wav`}
+                        playbackState={audioPlaybackState}
+                        onChangePlaybackState={setAudioPlaybackState}
                       />
                     </li>
                   ))}
