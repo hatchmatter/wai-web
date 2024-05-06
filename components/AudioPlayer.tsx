@@ -36,45 +36,43 @@ const AudioPlayer = ({ agentId, audioPath, playbackState, onChangePlaybackState 
     </svg>
   );
 
-  // clean up audio on dismount
+  // set up audio source on mount, and clean up audio on dismount
   useEffect(() => {
-    return () => {
-      cleanUpAudio();
-    };
-  }, [])
-
-  // cleans up audio if it should no longer be running (audio was switched)
-  useEffect(() => {
-    if (playbackState.isPlaying && agentId !== playbackState.id) {
-      cleanUpAudio();
-    }
-  }, [playbackState])
-
-  const cleanUpAudio = () => {
     if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.src = "";
+      audioRef.current.src = audioPath;
       audioRef.current.load();
     }
-  };
+    
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+        audioRef.current.load();
+      }
+    };
+  }, [audioPath]);
+
+  // resets audio if another is playing (audio was switched)
+  useEffect(() => {
+    if (playbackState.isPlaying && agentId !== playbackState.id) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  }, [playbackState]);
 
   const stopAudio = () => {
-    cleanUpAudio();
+    audioRef.current.pause();
+    audioRef.current.currentTime = 0;
     onChangePlaybackState({ isPlaying: false, id: ""});
   };
 
-  const playAudio = (agentId: string, path: string) => {
+  const handlePlayback = (agentId: string) => {
     if (playbackState.isPlaying && playbackState.id === agentId) {
       stopAudio();
     } else {
       onChangePlaybackState({ isPlaying: true, id: agentId });
       if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = path;
-        audioRef.current.load();
-        audioRef.current.onloadeddata = () => {
-          audioRef.current.play();
-        };
+        audioRef.current.play();
       }
     }
   };
@@ -85,22 +83,17 @@ const AudioPlayer = ({ agentId, audioPath, playbackState, onChangePlaybackState 
         <button
           type="button"
           className="icon-button"
-          onClick={() => playAudio(agentId, audioPath)}
+          onClick={() => handlePlayback(agentId)}
         >
           {playbackState.isPlaying && playbackState.id === agentId
             ? pauseButton
             : playButton}
         </button>
-        {playbackState.isPlaying && (
-          <audio
-            ref={audioRef}
-            src={audioPath}
-            onLoadedData={() => {
-              audioRef.current.play();
-            }}
-            onEnded={stopAudio}
-          />
-        )}
+        <audio
+          ref={audioRef}
+          src={audioPath}
+          onEnded={stopAudio}
+        />
       </div>
     </>
   );
