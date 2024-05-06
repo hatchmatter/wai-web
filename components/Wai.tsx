@@ -150,7 +150,8 @@ function Wai({callerId}: WaiProps) {
 
     const registerCallResponse = await registerCall(
       settings?.agent_id || process.env.NEXT_PUBLIC_DEFAULT_AGENT_ID,
-      Intl.DateTimeFormat().resolvedOptions().timeZone
+      Intl.DateTimeFormat().resolvedOptions().timeZone,
+      callerId
     );
 
     if (registerCallResponse.callId) {
