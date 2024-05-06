@@ -8,7 +8,7 @@ import { Section, SectionDescription, SectionContent } from "@/components/ui/Sec
 import { useGetUser } from "@/hooks";
 import AudioPlayer from "@/components/AudioPlayer";
 
-export type AudioInfo = {
+type AudioInfo = {
   isPlaying: boolean;
   id: string;
 }
@@ -90,6 +90,14 @@ export default function SettingsWai() {
     toast.success("Wai info saved!");
   };
 
+  const handlePlayback = (agentId: string) => {
+    if (audioPlaybackState.isPlaying && audioPlaybackState.id === agentId) {
+      setAudioPlaybackState({ isPlaying: false, id: "" });
+    } else {
+      setAudioPlaybackState({ isPlaying: true, id: agentId });
+    }
+  };
+
   return (
     <Section>
       <SectionDescription>
@@ -143,10 +151,10 @@ export default function SettingsWai() {
                         </label>
                       </div>
                       <AudioPlayer
-                        agentId={agent.id}
+                        id={agent.id}
                         audioPath={`/audio/${agent.name}.wav`}
-                        playbackState={audioPlaybackState}
-                        onChangePlaybackState={setAudioPlaybackState}
+                        isPlaying={audioPlaybackState.id === agent.id && audioPlaybackState.isPlaying} // used to tell if this audio player should be playing audio
+                        onChangePlayback={handlePlayback}
                       />
                     </li>
                   ))}
