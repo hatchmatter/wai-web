@@ -90,10 +90,10 @@ export default function SettingsWai() {
     toast.success("Wai info saved!");
   };
 
-  const handlePlayback = (agentId: string) => {
-    if (audioPlaybackState.isPlaying && audioPlaybackState.id === agentId) {
+  const togglePlayback = (agentId: string) => {
+    if (audioPlaybackState.isPlaying && audioPlaybackState.id === agentId) { // if the audio toggled is already being played, stop it from playing
       setAudioPlaybackState({ isPlaying: false, id: "" });
-    } else {
+    } else { // play audio that is toggled
       setAudioPlaybackState({ isPlaying: true, id: agentId });
     }
   };
@@ -154,7 +154,7 @@ export default function SettingsWai() {
                         id={agent.id}
                         audioPath={`/audio/${agent.name}.wav`}
                         isPlaying={audioPlaybackState.id === agent.id && audioPlaybackState.isPlaying} // used to tell if this audio player should be playing audio
-                        onChangePlayback={handlePlayback}
+                        onChangePlayback={togglePlayback}
                       />
                     </li>
                   ))}
