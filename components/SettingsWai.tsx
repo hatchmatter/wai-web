@@ -5,7 +5,7 @@ import { createClient } from "@/libs/supabase-client";
 import toast from "react-hot-toast";
 
 import { Section, SectionDescription, SectionContent } from "@/components/ui/Section";
-import TogglePromptOption from "@/components/TogglePromptOption";
+import TogglePromptOption from "@/components/SettingsOption";
 import { useGetUser } from "@/hooks";
 import AudioPlayer from "@/components/AudioPlayer";
 
@@ -14,21 +14,20 @@ type AudioInfo = {
   id: string;
 }
 
-interface PromptOption {
-  enabled: boolean;
-  description: string;
+type PromptOption = {
+  "Mythical Characters": boolean;
 }
 
-interface Settings {
+type Settings = {
   agent_id: string;
   assistant_name: string;
-  prompt_options: Record<string, PromptOption>;
+  prompt_options: PromptOption;
 }
 
 export default function SettingsWai() {
   const supabase = createClient();
   const user = useGetUser();
-  const [settings, setSettings] = useState<Settings>({ agent_id: "", assistant_name: "", prompt_options: {} });
+  const [settings, setSettings] = useState<Settings>({ agent_id: "", assistant_name: "", prompt_options: { "Mythical Characters": false } });
   const [agents, setAgents] = useState<any[]>([]);
   const [audioPlaybackState, setAudioPlaybackState] = useState<AudioInfo>({ isPlaying: false, id: "" });
 
@@ -176,25 +175,19 @@ export default function SettingsWai() {
             </div>
           )}
           <div className="sm:col-span-3">
-            {settings.prompt_options && Object.entries(settings.prompt_options).map(([key, option]) => (
-              <TogglePromptOption
-                key={key}
-                optionName={key}
-                checked={option.enabled}
-                onChange={(e) => {
-                  setSettings({
-                    ...settings,
-                    prompt_options: {
-                      ...settings.prompt_options,
-                      [key]: {
-                        ...settings.prompt_options[key],
-                        enabled: e.target.checked
-                      }
-                    }
-                  });
-                }}
-              />
-            ))}
+            <TogglePromptOption
+              key={"Mythical Characters"}
+              optionName={"Mythical Characters"}
+              checked={settings.prompt_options["Mythical Characters"]}
+              onChange={(e) => {
+                setSettings({
+                  ...settings,
+                  prompt_options: {
+                    "Mythical Characters": e.target.checked,
+                  }
+                });
+              }}
+            />
             <button type="submit" className="btn btn-primary">
               Save
             </button>

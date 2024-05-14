@@ -277,6 +277,7 @@ export type Database = {
           assistant_name: string
           created_at: string
           id: string
+          prompt_options: Json | null
           updated_at: string | null
         }
         Insert: {
@@ -284,6 +285,7 @@ export type Database = {
           assistant_name?: string
           created_at?: string
           id: string
+          prompt_options?: Json | null
           updated_at?: string | null
         }
         Update: {
@@ -291,6 +293,7 @@ export type Database = {
           assistant_name?: string
           created_at?: string
           id?: string
+          prompt_options?: Json | null
           updated_at?: string | null
         }
         Relationships: [
@@ -466,7 +469,7 @@ export type Database = {
         Args: {
           name: string
         }
-        Returns: unknown
+        Returns: string[]
       }
       get_size_by_bucket: {
         Args: Record<PropertyKey, never>

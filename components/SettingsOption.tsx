@@ -1,12 +1,12 @@
 "use client";
 
-type TogglePromptOptionProps = {
+type SettingsOptionProps = {
   optionName: string;
   checked: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-const TogglePromptOption = ({ optionName, checked, onChange }: TogglePromptOptionProps) => {
+const SettingsOption = ({ optionName, checked, onChange }: SettingsOptionProps) => {
   return (
     <>
       <div>
@@ -26,4 +26,4 @@ const TogglePromptOption = ({ optionName, checked, onChange }: TogglePromptOptio
   );
 };
 
-export default TogglePromptOption;
+export default SettingsOption;
