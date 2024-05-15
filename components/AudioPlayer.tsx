@@ -34,30 +34,6 @@ const AudioPlayer = ({ id, audioPath, isPlaying, onChangePlayback }: AudioPlayer
     </svg>
   );
 
-  // handles initializing the audio source, as well as cleaning it up
-  useEffect(() => {
-    const initializeAudioSource = () => {
-      if (audioRef.current) {
-        audioRef.current.src = audioPath;
-        audioRef.current.load();
-      }
-    };
-
-    const cleanUpAudioSource = () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = "";
-        audioRef.current.load();
-      }
-    };
-
-    initializeAudioSource();
-
-    return () => {
-      cleanUpAudioSource();
-    };
-  }, [audioPath]);
-
   // handles whether the audio should be playing or not
   useEffect(() => {
     const handleAudioControl = () => {
