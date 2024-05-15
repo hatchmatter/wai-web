@@ -28,18 +28,32 @@ function Wai({callerId}: WaiProps) {
   const [isAgentTalking, setIsAgentTalking] = useState<boolean>(false);
   // const [audioData, setAudioData] = useState<Uint8Array | null>(null);
   const [callId, setCallId] = useState<string | null>();
+  const [wakeLockActive, setWakeLockActive] = useState<boolean>(false);
   const [transcript, setTranscript] = useState<Array<{} | null>>();
   const supabase = createClient();
 
-  const {
-    request: requestWakeLock,
-    release: releaseWakeLock,
-    released,
+  const { 
+    request: requestWakeLock, 
+    release: releaseWakeLock 
   } = useWakeLock({
-    // onRequest: () => console.log("Screen Wake Lock: requested!"),
+    //onRequest: () => console.log("Screen Wake Lock: requested!"),
     onError: (e) => console.error("An error happened 💥", e),
-    // onRelease: () => console.log("Screen Wake Lock: released!"),
+    //onRelease: () => console.log("Screen Wake Lock: released!"),
   });
+
+  const wakeLockRequest = () => {
+    if (!wakeLockActive) {
+      requestWakeLock();
+      setWakeLockActive(true);
+    }
+  };
+
+  const wakeLockRelease = () => {
+    if (wakeLockActive) {
+      releaseWakeLock();
+      setWakeLockActive(false);
+    }
+  };
 
   // This is used to wake the heroku server on the first load
   useEffect(() => {
@@ -139,7 +153,7 @@ function Wai({callerId}: WaiProps) {
   }, 800);
 
   const startMic = async () => {
-    requestWakeLock();
+    wakeLockRequest();
     setIsSettingUp(true);
 
     const { data: settings } = await supabase
@@ -150,7 +164,8 @@ function Wai({callerId}: WaiProps) {
 
     const registerCallResponse = await registerCall(
       settings?.agent_id || process.env.NEXT_PUBLIC_DEFAULT_AGENT_ID,
-      Intl.DateTimeFormat().resolvedOptions().timeZone
+      Intl.DateTimeFormat().resolvedOptions().timeZone,
+      callerId
     );
 
     if (registerCallResponse.callId) {
@@ -169,9 +184,7 @@ function Wai({callerId}: WaiProps) {
   };
 
   const stopMic = () => {
-    if (!released) {
-      releaseWakeLock();
-    }
+    wakeLockRelease();
 
     retell.stopConversation();
   };
