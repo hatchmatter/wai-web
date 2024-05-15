@@ -6,12 +6,19 @@ import toast from "react-hot-toast";
 
 import { Section, SectionDescription, SectionContent } from "@/components/ui/Section";
 import { useGetUser } from "@/hooks";
+import AudioPlayer from "@/components/AudioPlayer";
+
+type AudioInfo = {
+  isPlaying: boolean;
+  id: string;
+}
 
 export default function SettingsWai() {
   const supabase = createClient();
   const user = useGetUser();
   const [settings, setSettings] = useState<any>({});
   const [agents, setAgents] = useState<any[]>([]);
+  const [audioPlaybackState, setAudioPlaybackState] = useState<AudioInfo>({ isPlaying: false, id: "" });
 
   useEffect(() => {
     if (!user) return;
@@ -58,6 +65,7 @@ export default function SettingsWai() {
 
     const form = e.currentTarget;
     const formData = new FormData(form);
+
     const entries = Object.fromEntries(formData);
 
     const { data: _settings, error } = await supabase
@@ -80,6 +88,14 @@ export default function SettingsWai() {
     }
 
     toast.success("Wai info saved!");
+  };
+
+  const togglePlayback = (agentId: string) => {
+    if (audioPlaybackState.isPlaying && audioPlaybackState.id === agentId) { // if the audio toggled is already being played, stop it from playing
+      setAudioPlaybackState({ isPlaying: false, id: "" });
+    } else { // play audio that is toggled
+      setAudioPlaybackState({ isPlaying: true, id: agentId });
+    }
   };
 
   return (
@@ -113,28 +129,37 @@ export default function SettingsWai() {
 
           {agents.length > 0 && (
             <div className="col-span-full">
-              <label className="form-control w-full max-w-xs">
+              <div className="form-control w-full max-w-xs">
                 <div className="label">
                   <span className="label-text">Voice</span>
                 </div>
-                <select
-                  className="select select-bordered"
-                  name="agent_id"
-                  value={
-                    settings?.agent_id ||
-                    agents.find((agent) => agent.name === "Shimmer")?.id
-                  }
-                  onChange={(e) =>
-                    setSettings({ ...settings, agent_id: e.target.value })
-                  }
-                >
+                <ul role="list" className="divide-y divide-gray-100">
                   {agents.map((agent) => (
-                    <option key={agent.id} value={agent.id}>
-                      {agent.name}
-                    </option>
+                    <li key={agent.id} className="flex justify-between items-center py-5">
+                      <div className="flex items-center gap-x-2">
+                        <input 
+                          id={agent.id} 
+                          type="radio" 
+                          name="agent_id" 
+                          className="radio radio-primary"
+                          value={agent.id}
+                          onChange={(e) => setSettings({ ...settings, agent_id: e.target.value })}
+                          checked={settings?.agent_id === agent.id}
+                        />
+                        <label htmlFor={agent.id} className="text-sm font-semibold leading-6 text-gray-900 cursor-pointer">
+                            {agent.name}
+                        </label>
+                      </div>
+                      <AudioPlayer
+                        id={agent.id}
+                        audioPath={`/audio/${agent.name}.wav`}
+                        isPlaying={audioPlaybackState.id === agent.id && audioPlaybackState.isPlaying} // used to tell if this audio player should be playing audio
+                        onChangePlayback={togglePlayback}
+                      />
+                    </li>
                   ))}
-                </select>
-              </label>
+                </ul>
+              </div>
             </div>
           )}
           <div>

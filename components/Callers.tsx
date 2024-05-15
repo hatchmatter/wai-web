@@ -41,7 +41,7 @@ export default function Callers() {
         .not("current_caller_id", "is", null)
         .order("ended_at", { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error("Error fetching last call:", error);
