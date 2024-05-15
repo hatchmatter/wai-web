@@ -1,9 +1,11 @@
 "use client";
 
+import { ChangeEvent } from "react";
+
 type SettingsOptionProps = {
   optionName: string;
   checked: boolean;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 };
 
 const SettingsOption = ({ optionName, checked, onChange }: SettingsOptionProps) => {
