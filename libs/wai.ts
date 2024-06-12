@@ -3,6 +3,10 @@ interface RegisterCallResponse {
   sampleRate?: number;
 }
 
+interface RegisterImageUrl {
+  imageUrl: string
+}
+
 const headers = new Headers();
 headers.append("Content-Type", "application/json");
 
@@ -28,6 +32,25 @@ export async function registerCall(
   if (!response.ok) {
     console.error(`Error: ${response.status} - ${response.statusText}`);
     return {};
+  }
+
+  return await response.json();
+}
+
+export async function generateImage(
+  prompt: string
+): Promise<RegisterImageUrl> {
+  const response = await fetch(`/api/call/image`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      prompt
+    }),
+  });
+
+  if (!response.ok) {
+    console.error(`Error: ${response.status} - ${response.statusText}`);
+    return { imageUrl: "" };
   }
 
   return await response.json();

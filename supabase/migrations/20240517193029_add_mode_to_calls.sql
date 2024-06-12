@@ -1,0 +1,1 @@
+alter table public.calls add column mode text default 'chat' not null;

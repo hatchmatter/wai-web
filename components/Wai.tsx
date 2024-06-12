@@ -6,7 +6,8 @@ import { useWakeLock } from "react-screen-wake-lock";
 import { debounce, pick, throttle } from "lodash";
 
 import { createClient } from "@/libs/supabase-client";
-import { registerCall, healthCheck } from "@/libs/wai";
+import { registerCall,  healthCheck } from "@/libs/wai";
+import ImageGenerator from "@/components/ImageGenerator";
 import { useGetUser } from "@/hooks";
 
 // import Visualizer from "@/components/Visualizer";
@@ -26,6 +27,8 @@ function Wai({callerId}: WaiProps) {
   const [isCalling, setIsCalling] = useState<boolean>(false);
   const [isSettingUp, setIsSettingUp] = useState<boolean>(false);
   const [isAgentTalking, setIsAgentTalking] = useState<boolean>(false);
+  const [isStoryMode, setIsStoryMode] = useState<boolean>(true);
+  const [storyTranscript, setStoryTranscript] = useState<string[]>([]);
   // const [audioData, setAudioData] = useState<Uint8Array | null>(null);
   const [callId, setCallId] = useState<string | null>();
   const [wakeLockActive, setWakeLockActive] = useState<boolean>(false);
@@ -134,19 +137,45 @@ function Wai({callerId}: WaiProps) {
     });
 
     retell.on("update", (update) => {
-      setTranscript(update.transcript);
+      if (update.event_type === "metadata") {
+        // if (update.metadata.story_mode !== isStoryMode) {
+        //   //console.log(update);
+        //   setIsStoryMode(update.metadata.story_mode);
+        // }
+        if (update.metadata.transcript) {
+          updateStoryTranscript(update.metadata.transcript, update.metadata.new_story);
+        }
+      } else {
+        setTranscript(update.transcript);
 
-      const lastIndex = update.transcript.length - 1;
-      const role = update.transcript[lastIndex].role;
+        const lastIndex = update.transcript.length - 1;
+        const role = update.transcript[lastIndex].role;
 
-      if (role === "agent") {
-        setIsAgentTalking(true);
-        handleAgentTalking();
+        if (role === "agent") {
+          setIsAgentTalking(true);
+          handleAgentTalking();
+        }
       }
     });
 
     window.scrollTo(0, document.body.scrollHeight);
   }, [callId]);
+
+  const updateStoryTranscript = (transcript: any, newStory: any) => {
+    //if (newStory) console.log("New Story");
+    setStoryTranscript((prevStoryTranscript) => {
+      if (newStory) {
+        return [transcript];
+      } else {
+        if (prevStoryTranscript[prevStoryTranscript.length - 1] === transcript) {
+          return prevStoryTranscript;
+        } else {
+          return [...prevStoryTranscript, transcript];
+        }
+      }
+    });
+    //console.log(transcript);
+  };
 
   const handleAgentTalking = debounce(() => {
     setIsAgentTalking(false);
@@ -190,33 +219,38 @@ function Wai({callerId}: WaiProps) {
   };
 
   return (
-    <div className="flex flex-col flex-1 items-center justify-center">
-      {!isCalling ? (
-        <button
-          className="btn btn-primary w-screen h-screen rounded-none text-2xl"
-          onClick={startMic}
-          disabled={isSettingUp}
-        >
-          {isSettingUp ? (
-            <span className="loading loading-infinity loading-lg w-24"></span>
-          ) : (
-            "Start"
-          )}
-        </button>
-      ) : (
-        <button
-          className="btn btn-accent w-screen h-screen rounded-none text-2xl"
-          onClick={stopMic}
-        >
-          {isAgentTalking ? (
-            <span className="loading loading-ring loading-lg w-16"></span>
-          ) : (
-            "Stop"
-          )}
-        </button>
-      )}
-      {/* <Visualizer data={audioData} isActive={isCalling} /> */}
-    </div>
+    <>
+      <div className="flex flex-col flex-1 items-center justify-center">
+        {!isCalling ? (
+          <button
+            className="btn btn-primary w-screen h-screen rounded-none text-2xl"
+            onClick={startMic}
+            disabled={isSettingUp}
+          >
+            {isSettingUp ? (
+              <span className="loading loading-infinity loading-lg w-24"></span>
+            ) : (
+              "Start"
+            )}
+          </button>
+        ) : (
+          <button
+            className="btn btn-accent w-screen h-screen rounded-none text-2xl"
+            onClick={stopMic}
+          >
+            {isAgentTalking ? (
+              <span className="loading loading-ring loading-lg w-16"></span>
+            ) : (
+              "Stop"
+            )}
+          </button>
+        )}
+        {/* <Visualizer data={audioData} isActive={isCalling} /> */}
+      </div>
+      <div>
+        <ImageGenerator transcript={storyTranscript}/>
+      </div>
+    </>
   );
 }
 
