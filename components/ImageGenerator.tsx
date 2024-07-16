@@ -6,7 +6,7 @@ type ImageGeneratorProps = {
 };
 
 const ImageGenerator = ({ transcript }: ImageGeneratorProps) => {
-  const [imageUrls, setImageUrls] = useState<any>([]); // change from any
+  const [imageUrls, setImageUrls] = useState<any>([]);
   const [displayIndex, setDisplayIndex] = useState<number | null>(null);
 
   useEffect(() => {
@@ -24,10 +24,8 @@ const ImageGenerator = ({ transcript }: ImageGeneratorProps) => {
             backstory += transcript[j];
           }
         }
-        console.log("Time to generate a new image for:\n", transcript[i]);
         const url = await generateImage(imagePrompt(firstImage, transcript[i], backstory));
         setImageUrls((prevUrls: string[]) => [...prevUrls, url.imageUrl]);
-        console.log("New display index: ", imageUrls.length);
       }
     };
 
@@ -54,9 +52,9 @@ const ImageGenerator = ({ transcript }: ImageGeneratorProps) => {
     let prompt = stylingGuidelines;
 
     if (firstImage) {
-      prompt += `This is the first image in the series so there isn't a backstory.`;
+      prompt += `This is the first image in the series so there isn't a backstory. `;
     } else {
-      prompt += `Previous backstory: ${backStory}`;
+      prompt += `Previous backstory: ${backStory} `;
     }
 
     prompt += `With these art style guidelines and backstory in mind if there is one, please illustrate the following: ${story}`;

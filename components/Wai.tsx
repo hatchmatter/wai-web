@@ -27,7 +27,6 @@ function Wai({callerId}: WaiProps) {
   const [isCalling, setIsCalling] = useState<boolean>(false);
   const [isSettingUp, setIsSettingUp] = useState<boolean>(false);
   const [isAgentTalking, setIsAgentTalking] = useState<boolean>(false);
-  const [isStoryMode, setIsStoryMode] = useState<boolean>(true);
   const [storyTranscript, setStoryTranscript] = useState<string[]>([]);
   // const [audioData, setAudioData] = useState<Uint8Array | null>(null);
   const [callId, setCallId] = useState<string | null>();
@@ -138,10 +137,6 @@ function Wai({callerId}: WaiProps) {
 
     retell.on("update", (update) => {
       if (update.event_type === "metadata") {
-        // if (update.metadata.story_mode !== isStoryMode) {
-        //   //console.log(update);
-        //   setIsStoryMode(update.metadata.story_mode);
-        // }
         if (update.metadata.transcript) {
           updateStoryTranscript(update.metadata.transcript, update.metadata.new_story);
         }
@@ -162,7 +157,6 @@ function Wai({callerId}: WaiProps) {
   }, [callId]);
 
   const updateStoryTranscript = (transcript: any, newStory: any) => {
-    //if (newStory) console.log("New Story");
     setStoryTranscript((prevStoryTranscript) => {
       if (newStory) {
         return [transcript];
@@ -174,7 +168,6 @@ function Wai({callerId}: WaiProps) {
         }
       }
     });
-    //console.log(transcript);
   };
 
   const handleAgentTalking = debounce(() => {
