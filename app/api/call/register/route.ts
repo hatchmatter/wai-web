@@ -27,11 +27,36 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Not authorized" }, { status: 403 });
     }
 
-    const { call_id, sample_rate } = await retell.call.register({
+    const { data: caller, error: callerError } = await supabase
+      .from("callers")
+      .select("*")
+      .eq("id", callerId)
+      .single();
+
+    if (callerError) {
+      throw callerError;
+    }
+
+    const { data: settings, error: settingsError } = await supabase
+      .from("settings")
+      .select("assistant_name")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (settingsError) {
+      throw settingsError;
+    }
+
+    const { call_id } = await retell.call.createWebCall({
       agent_id: agentId,
-      audio_websocket_protocol: "web",
-      audio_encoding: "s16le",
-      sample_rate: 24000,
+      // metadata is sent to wss and stored in the call state
+      // it's passed to tools
+      metadata: {
+        user: user,
+        caller: caller,
+        assistant_name: settings?.assistant_name,
+        timezone,
+      },
     });
 
     const { error: callError } = await supabase.from("calls").insert({
