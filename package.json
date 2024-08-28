@@ -42,7 +42,7 @@
     "react-syntax-highlighter": "^15.5.0",
     "react-tooltip": "^5.21.1",
     "retell-client-js-sdk": "1.3.2",
-    "retell-sdk": "3.8.0",
+    "retell-sdk": "4.2.0",
     "stripe": "^13.2.0",
     "zod": "^3.22.2"
   },

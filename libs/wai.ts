@@ -13,7 +13,8 @@ if (process.env.NODE_ENV === "development") {
 export async function registerCall(
   agentId: string,
   timezone?: string,
-  callerId?: string
+  callerId?: string,
+  userId?: string
 ): Promise<RegisterCallResponse> {
   const response = await fetch(`/api/call/register`, {
     method: "POST",
@@ -22,6 +23,7 @@ export async function registerCall(
       agentId,
       timezone,
       callerId,
+      userId,
     }),
   });
 

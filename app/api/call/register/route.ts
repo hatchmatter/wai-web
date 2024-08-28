@@ -54,7 +54,11 @@ export async function POST(req: NextRequest) {
       metadata: {
         user: user,
         caller: caller,
+<<<<<<< HEAD
         assistant_name: settings?.assistant_name,
+=======
+        agent: agent,
+>>>>>>> f0bd527 (update register call, copy tweaks, pkg upgrade)
         timezone,
       },
     });
@@ -70,7 +74,7 @@ export async function POST(req: NextRequest) {
       throw callError;
     }
 
-    return NextResponse.json({ callId: call_id, sampleRate: sample_rate });
+    return NextResponse.json({ callId: call_id, sampleRate: 48000 });
   } catch (e) {
     console.error(e);
     return NextResponse.json(
