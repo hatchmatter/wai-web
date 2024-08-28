@@ -54,11 +54,7 @@ export async function POST(req: NextRequest) {
       metadata: {
         user: user,
         caller: caller,
-<<<<<<< HEAD
         assistant_name: settings?.assistant_name,
-=======
-        agent: agent,
->>>>>>> f0bd527 (update register call, copy tweaks, pkg upgrade)
         timezone,
       },
     });
