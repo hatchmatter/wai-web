@@ -17,22 +17,33 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        name: Checkout Repository
 
       - uses: supabase/setup-cli@v1
+        name: Setup Supabase CLI
         with:
           version: latest
 
-      - run: supabase link --project-ref $SUPABASE_PROJECT_ID
-      - run: supabase db push
+      - name: Link Supabase Project
+        run: supabase link --project-ref $SUPABASE_PROJECT_ID
+      - name: Push Migrations to Staging
+        run: supabase db push
+  
   deploy:
     runs-on: ubuntu-latest
+
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      DOMAIN: wai-staging.hatchmatter.com
+      TEAM: hatchmatter-projects
+
     steps:
       - uses: actions/checkout@v3
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
       - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
       - name: Build Project Artifacts
-        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
-      - name: Deploy Project Artifacts to Vercel
-        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel build --token=$VERCEL_TOKEN
+      - name: Deploy Project Artifacts to Vercel and Alias Staging Domain
+        run: bash bin/deploy-staging.sh

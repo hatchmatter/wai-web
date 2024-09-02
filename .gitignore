@@ -29,6 +29,9 @@ yarn-error.log*
 .env.staging
 .env.production
 
+# local secrets files
+.secrets
+
 # vercel
 .vercel
 
@@ -42,3 +45,5 @@ public/sitemap.xml
 public/sitemap-0.xml
 
 ngrok.yml
+deployment-url.txt
+error.txt
