@@ -5,12 +5,11 @@
 
 ## Development
 
-Wai is built on Next.js, Supabase, and Stripe. This section will guide you through setting up your development environment.
+Wai is built with Next.js and Supabase. This section will guide you through setting up your development environment.
 
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/en/)
-- [Stripe CLI](https://stripe.com/docs/stripe-cli) (optional)
 - [Docker](https://www.docker.com/products/docker-desktop)
 - [Supabase CLI](https://supabase.io/docs/guides/cli) (you'll need a supabase dev account)
 
@@ -23,28 +22,22 @@ Wai is built on Next.js, Supabase, and Stripe. This section will guide you throu
 scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
 scoop install supabase
 ```
-- Install stripe cli with `brew install stripe/stripe-cli/stripe` (optional)
 - Run `npm install` to install the dependencies
 
 ### Running the app
 
-- Run `supabase start` to start the local supabase server
+- Run `npm run supabase:start` to start the local supabase server
 - Run `npm run dev` to start the development server
 - Start the Wai Web Socket Server (see below)
 - Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-### Stripe
-
-- run `stripe login`
-- run `stripe listen --forward-to localhost:3000/api/webhook/stripe`
-
 ### Supabase
 
 - open [http://127.0.0.1:54323](http://127.0.0.1:54323/) to access the local supabase admin interface
-- Create migrations using the supabase cli `supabase migration new <migration_name>`
 
 #### Migrations
 
+- Create migrations using the supabase cli `supabase migration new <migration_name>`
 - Run `supabase migrate up` to apply migrations
 - Run `supabase db reset` to reset the database, apply all migrations, and seed the database
   - After resetting you'll have to create a new user via the supabase admin interface [http://127.0.0.1:54323](http://127.0.0.1:54323/)
@@ -53,19 +46,23 @@ scoop install supabase
 - Check transactional emails like login links at [http://127.0.0.1:54324/](http://127.0.0.1:54324/)
 
 ### Wai Web Socket Server
-- `wai-wss` runs in on heroku, but you can run it locally for development using instructions below
-- To test Wai locally, ensure the WSS is running (see repo for instructions)
-- Run ngrok to expose the WSS to the internet `ngrok http 8080` You'll need to set up an [ngrok](https://ngrok.com/) account and set a custom domain. Once you've done that, add the ngrok url to the retellai.com dashboard for every agent being used.
+- See [wai-wss](https://github.com/hatchmatterllc/wai-wss) for more information on setting up the Wai Web Socket Server
+- sign up for [ngrok](https://ngrok.com/) and set up a custom domain
+- Get `ngrok.yml` file from your friendly neighborhood developer
+- Run `ngrok start wai-wss wai-web --config ngrok.yml` to expose the WSS to the internet
+- Once you've done that, add the ngrok url to the retellai.com dashboard for every agent being used.
 
 ## Development Workflow
-- Create a new branch off of `develop` for your feature
-- Push your branch to the remote
-- Create a pull request to `develop`
+- Create a new branch off of `main` for your feature
+- Push your branch to github
+- Create a pull request to `main`
+- Get your code approved
 - Merge your pull request
 - Delete your branch
+- Your code will now be on staging-wai.hatchmatter.com
 
 ## Deployment
-The app is hosted on Vercel and is automatically deployed to "staging" on push to the remote `develop` branch. The environment variables are set in the Vercel dashboard. Push to the `main` branch to deploy to production. Supabase migrations run automatically on deployment.
+The app is hosted on Vercel and is automatically deployed to "staging" on push to the remote `main` branch. The environment variables are set in the Vercel dashboard. Create a release with a new tag from the `main` branch to deploy to production. Supabase migrations run automatically on deployment.
 
 ## Seeding
 See [https://supabase.com/docs/guides/cli/seeding-your-database](https://supabase.com/docs/guides/cli/seeding-your-database) for more information on seeding the database.
