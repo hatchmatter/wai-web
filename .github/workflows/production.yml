@@ -25,7 +25,7 @@ jobs:
           version: latest
       
       - name: Link Supabase Project
-        run: supabase link --project-ref $SUPABASE_PROJECT_ID
+        run: supabase link --project-ref ${{ secrets.PRODUCTION_PROJECT_ID }}
       - name: Push Migrations to Production
         run: supabase db push
 

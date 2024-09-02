@@ -1,0 +1,3 @@
+Vercel CLI 37.2.1
+Error: You defined "--token", but it's missing a value
+Learn More: https://err.sh/vercel/missing-token-value
