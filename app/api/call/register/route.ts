@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       throw callError;
     }
 
-    return NextResponse.json({ callId: call_id, sampleRate: sample_rate });
+    return NextResponse.json({ callId: call_id, sampleRate: 48000 });
   } catch (e) {
     console.error(e);
     return NextResponse.json(

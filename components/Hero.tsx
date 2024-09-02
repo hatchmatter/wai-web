@@ -23,13 +23,13 @@ const Hero = () => {
         </a> */}
 
         <h1 className="font-extrabold text-4xl lg:text-6xl tracking-tight md:-mb-4">
-          The first kid-friendly AI assistant
+          Kid-friendly AI assistant for parents
         </h1>
         <p className="text-lg opacity-80 leading-relaxed">
           {config.appDescription}
         </p>
         <p className="font-bold">
-          Wai is currently in private beta mode. Join the waitlist to get in the
+          Wai is currently in private beta. Join the waitlist to get in the
           queue for public beta.
         </p>
         {/* <button className="btn btn-primary btn-wide">

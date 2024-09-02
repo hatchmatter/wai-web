@@ -57,7 +57,7 @@ function Wai({callerId}: WaiProps) {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === "hidden") {
-        stopMic();
+        // stopMic();
       }
     };
 
@@ -150,7 +150,9 @@ function Wai({callerId}: WaiProps) {
 
     const registerCallResponse = await registerCall(
       settings?.agent_id || process.env.NEXT_PUBLIC_DEFAULT_AGENT_ID,
-      Intl.DateTimeFormat().resolvedOptions().timeZone
+      Intl.DateTimeFormat().resolvedOptions().timeZone,
+      callerId,
+      user?.id
     );
 
     if (registerCallResponse.callId) {

@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     process.env.SUPABASE_SERVICE_ROLE_KEY
   );
 
-  if (event === "call_ended") {
+  if (event === "call_ended" && data.transcript) {
     try {
       const completion = await createCompletions([
         systemSummarizePrompt,
