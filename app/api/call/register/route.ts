@@ -12,7 +12,7 @@ const retell = new Retell({
 });
 
 export async function POST(req: NextRequest) {
-  const { agentId, timezone, callerId } = await req.json();
+  const { timezone, callerId } = await req.json();
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
 
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (error) {
-      console.error(error);
+      console.error("error getting user: ", error);
       return NextResponse.json({ error: "Not authorized" }, { status: 403 });
     }
 
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
 
     const { data: settings, error: settingsError } = await supabase
       .from("settings")
-      .select("assistant_name")
+      .select("assistant_name, agent_id")
       .eq("id", user.id)
       .maybeSingle();
 
@@ -47,14 +47,14 @@ export async function POST(req: NextRequest) {
       throw settingsError;
     }
 
-    const { call_id } = await retell.call.createWebCall({
-      agent_id: agentId,
+    const { call_id, access_token } = await retell.call.createWebCall({
+      agent_id: settings?.agent_id || process.env.NEXT_PUBLIC_DEFAULT_AGENT_ID,
       // metadata is sent to wss and stored in the call state
       // it's passed to tools
       metadata: {
         user: user,
         caller: caller,
-        assistant_name: settings?.assistant_name,
+        assistant_name: settings?.assistant_name || 'Wai',
         timezone,
       },
     });
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       throw callError;
     }
 
-    return NextResponse.json({ callId: call_id, sampleRate: 48000 });
+    return NextResponse.json({ callId: call_id, accessToken: access_token });
   } catch (e) {
     console.error(e);
     return NextResponse.json(

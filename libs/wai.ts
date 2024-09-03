@@ -1,6 +1,6 @@
 interface RegisterCallResponse {
   callId?: string;
-  sampleRate?: number;
+  accessToken?: string;
 }
 
 const headers = new Headers();
@@ -11,7 +11,6 @@ if (process.env.NODE_ENV === "development") {
 }
 
 export async function registerCall(
-  agentId: string,
   timezone?: string,
   callerId?: string,
   userId?: string
@@ -20,7 +19,6 @@ export async function registerCall(
     method: "POST",
     headers,
     body: JSON.stringify({
-      agentId,
       timezone,
       callerId,
       userId,

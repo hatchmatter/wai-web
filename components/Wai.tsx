@@ -17,11 +17,11 @@ if (process.env.NODE_ENV === "production") {
 
 const retell = new RetellWebClient();
 
-type WaiProps = { 
-  callerId: string
-}
+type WaiProps = {
+  callerId: string;
+};
 
-function Wai({callerId}: WaiProps) {
+function Wai({ callerId }: WaiProps) {
   const user = useGetUser();
   const [isCalling, setIsCalling] = useState<boolean>(false);
   const [isSettingUp, setIsSettingUp] = useState<boolean>(false);
@@ -57,7 +57,7 @@ function Wai({callerId}: WaiProps) {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === "hidden") {
-        // stopMic();
+        stopCall();
       }
     };
 
@@ -65,7 +65,7 @@ function Wai({callerId}: WaiProps) {
 
     return () => {
       window.removeEventListener("visibilitychange", handleVisibilityChange);
-      stopMic();
+      stopCall();
     };
   }, []);
 
@@ -99,70 +99,60 @@ function Wai({callerId}: WaiProps) {
   );
 
   useEffect(() => {
-    retell.on("conversationEnded", () => {
-      // saveTranscript();
-      setIsCalling(false);
-      // setCallId(null);
-    });
-
-    retell.on("conversationStarted", () => {
+    retell.on("call_started", () => {
       setIsCalling(true);
       setIsSettingUp(false);
     });
 
-    retell.on("audio", (audio: Uint8Array) => {
-      // setAudioData(audio);
+    retell.on("call_ended", () => {
+      setIsCalling(false);
+      // setCallId(null);
     });
+
+    // retell.on("audio", (_audio: Uint8Array) => {
+    //   // setAudioData(audio);
+    // });
 
     retell.on("error", (error) => {
       console.error("An error occurred:", error);
       setIsCalling(false);
+      retell.stopCall();
     });
 
     retell.on("update", (update) => {
       setTranscript(update.transcript);
-
-      const lastIndex = update.transcript.length - 1;
-      const role = update.transcript[lastIndex].role;
-
-      if (role === "agent") {
-        setIsAgentTalking(true);
-        handleAgentTalking();
-      }
     });
+
+    retell.on("agent_start_talking", () => {
+      setIsAgentTalking(true);
+    });
+
+    retell.on(
+      "agent_stop_talking",
+      debounce(() => {
+        setIsAgentTalking(false);
+      }, 500)
+    );
 
     window.scrollTo(0, document.body.scrollHeight);
   }, [callId]);
 
-  const handleAgentTalking = debounce(() => {
-    setIsAgentTalking(false);
-  }, 800);
-
-  const startMic = async () => {
+  const startCall = async () => {
     requestWakeLock();
     setIsSettingUp(true);
 
-    const { data: settings } = await supabase
-      .from("settings")
-      .select("agent_id, assistant_name")
-      .eq("id", user?.id)
-      .single();
-
-    const registerCallResponse = await registerCall(
-      settings?.agent_id || process.env.NEXT_PUBLIC_DEFAULT_AGENT_ID,
+    const { callId, accessToken } = await registerCall(
       Intl.DateTimeFormat().resolvedOptions().timeZone,
       callerId,
       user?.id
     );
 
-    if (registerCallResponse.callId) {
-      setCallId(registerCallResponse.callId);
+    if (callId) {
+      setCallId(callId);
 
       try {
-        await retell.startConversation({
-          callId: registerCallResponse.callId,
-          sampleRate: registerCallResponse.sampleRate,
-          enableUpdate: true,
+        await retell.startCall({
+          accessToken,
         });
       } catch (err) {
         console.error("Error starting conversation: ", err);
@@ -170,12 +160,12 @@ function Wai({callerId}: WaiProps) {
     }
   };
 
-  const stopMic = () => {
+  const stopCall = () => {
     if (!released) {
       releaseWakeLock();
     }
 
-    retell.stopConversation();
+    retell.stopCall();
   };
 
   return (
@@ -183,7 +173,7 @@ function Wai({callerId}: WaiProps) {
       {!isCalling ? (
         <button
           className="btn btn-primary w-screen h-screen rounded-none text-2xl"
-          onClick={startMic}
+          onClick={startCall}
           disabled={isSettingUp}
         >
           {isSettingUp ? (
@@ -195,7 +185,7 @@ function Wai({callerId}: WaiProps) {
       ) : (
         <button
           className="btn btn-accent w-screen h-screen rounded-none text-2xl"
-          onClick={stopMic}
+          onClick={stopCall}
         >
           {isAgentTalking ? (
             <span className="loading loading-ring loading-lg w-16"></span>
