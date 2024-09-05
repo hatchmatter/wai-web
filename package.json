@@ -1,6 +1,6 @@
 {
   "name": "wai-web",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -41,7 +41,7 @@
     "react-screen-wake-lock": "^3.0.2",
     "react-syntax-highlighter": "^15.5.0",
     "react-tooltip": "^5.21.1",
-    "retell-client-js-sdk": "2.0.2",
+    "retell-client-js-sdk": "2.0.4",
     "retell-sdk": "4.2.0",
     "stripe": "^13.2.0",
     "zod": "^3.22.2"
