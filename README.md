@@ -31,6 +31,22 @@ scoop install supabase
 - Start the Wai Web Socket Server (see below)
 - Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+### Running the app in a Dev Container (optional)
+
+- Ensure Dev Containers extension is installed for Visual Studio Code from [here](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+- Run `supabase start` to start the local supabase server
+- Build and open your project in a dev container
+  - In VS Code, open the Command Pallete
+  - Run `Dev Containers: Rebuild and Reopen in Container`
+- Run `npm run dev` from the dev container to start the development server
+- Start the Wai Web Socket Server (see below)
+- Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+### Stripe
+
+- run `stripe login`
+- run `stripe listen --forward-to localhost:3000/api/webhook/stripe`
+
 ### Supabase
 
 - open [http://127.0.0.1:54323](http://127.0.0.1:54323/) to access the local supabase admin interface
