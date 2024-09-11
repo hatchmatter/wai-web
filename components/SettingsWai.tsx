@@ -141,12 +141,12 @@ export default function SettingsWai() {
                           id={agent.id} 
                           type="radio" 
                           name="agent_id" 
-                          className="radio radio-primary"
+                          className="radio radio-xs radio-primary"
                           value={agent.id}
                           onChange={(e) => setSettings({ ...settings, agent_id: e.target.value })}
                           checked={settings?.agent_id === agent.id}
                         />
-                        <label htmlFor={agent.id} className="text-sm font-semibold leading-6 text-gray-900 cursor-pointer">
+                        <label htmlFor={agent.id} className="label-text">
                             {agent.name}
                         </label>
                       </div>
