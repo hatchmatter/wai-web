@@ -84,3 +84,7 @@ The app is hosted on Vercel and is automatically deployed to "staging" on push t
 See [https://supabase.com/docs/guides/cli/seeding-your-database](https://supabase.com/docs/guides/cli/seeding-your-database) for more information on seeding the database.
 
 - `DRY=0 npx tsx seed.mts` to seed the database with test data
+
+## Components
+
+For additional components and other functionality for stripe, mailgun, etc., see the [original shipfast](https://github.com/hatchmatterllc/wai-shipfast) repository.

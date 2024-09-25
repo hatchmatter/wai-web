@@ -9,33 +9,12 @@ import ButtonSignin from "./ButtonSignin";
 import logo from "@/app/icon.png";
 import config from "@/config";
 
-const links: {
-  href: string;
-  label: string;
-}[] = [
-  // {
-  //   href: "/#pricing",
-  //   label: "Pricing",
-  // },
-  // {
-  //   href: "/#testimonials",
-  //   label: "Reviews",
-  // },
-  // {
-  //   href: "/#faq",
-  //   label: "FAQ",
-  // },
-];
-
 const cta: JSX.Element = <ButtonSignin extraStyle="btn-primary" />;
 
-// A header with a logo on the left, links in the center (like Pricing, etc...), and a CTA (like Get Started or Login) on the right.
-// The header is responsive, and on mobile, the links are hidden behind a burger button.
 const Header = () => {
   const searchParams = useSearchParams();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  // setIsOpen(false) when the route changes (i.e: when the user clicks on a link on mobile)
   useEffect(() => {
     setIsOpen(false);
   }, [searchParams]);
@@ -46,22 +25,12 @@ const Header = () => {
         className="container flex items-center justify-between px-8 py-4 mx-auto max-w-7xl"
         aria-label="Global"
       >
-        {/* Your logo/name on large screens */}
         <div className="flex lg:flex-1">
           <Link
             className="flex items-center gap-2 shrink-0 "
             href="/"
             title={`${config.appName} homepage`}
           >
-            {/* <Image
-              src={logo}
-              alt={`${config.appName} logo`}
-              className="w-8"
-              placeholder="blur"
-              priority={true}
-              width={32}
-              height={32}
-            /> */}
             <span className="font-extrabold text-lg">{config.appName}</span>
           </Link>
         </div>
@@ -89,21 +58,6 @@ const Header = () => {
             </svg>
           </button>
         </div>
-
-        {/* Your links on large screens */}
-        <div className="hidden lg:flex lg:justify-center lg:gap-12 lg:items-center">
-          {links.map((link) => (
-            <Link
-              href={link.href}
-              key={link.href}
-              className="link link-hover"
-              title={link.label}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </div>
-
         {/* CTA on large screens */}
         <div className="hidden lg:flex lg:justify-end lg:flex-1">{cta}</div>
       </nav>
@@ -154,25 +108,8 @@ const Header = () => {
             </button>
           </div>
 
-          {/* Your links on small screens */}
-          <div className="flow-root mt-6">
-            <div className="py-4">
-              <div className="flex flex-col gap-y-4 items-start">
-                {links.map((link) => (
-                  <Link
-                    href={link.href}
-                    key={link.href}
-                    className="link link-hover"
-                    title={link.label}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-            {/* Your CTA on small screens */}
-            <div className="flex flex-col">{cta}</div>
-          </div>
+          {/* Your CTA on small screens */}
+          <div className="flex flex-col">{cta}</div>
         </div>
       </div>
     </header>
