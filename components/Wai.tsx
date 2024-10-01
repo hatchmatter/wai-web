@@ -71,7 +71,7 @@ function Wai({ callerId }: WaiProps) {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === "hidden") {
-        stopCall();
+        //stopCall();
       }
     };
 
@@ -79,7 +79,7 @@ function Wai({ callerId }: WaiProps) {
 
     return () => {
       window.removeEventListener("visibilitychange", handleVisibilityChange);
-      stopCall();
+      //stopCall();
     };
   }, []);
 
