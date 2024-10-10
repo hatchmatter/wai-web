@@ -39,10 +39,7 @@ const Modal = ({ isModalOpen, setIsModalOpen, title, text }: ModalProps) => {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div
-            className="fixed inset-0"
-            style={{ backgroundColor: "rgb(200, 200, 200)" }}
-          />
+          <div className="fixed inset-0 bg-gray-200 hidden md:block"></div>
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
@@ -56,8 +53,8 @@ const Modal = ({ isModalOpen, setIsModalOpen, title, text }: ModalProps) => {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="relative w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                <h2 className="text-3xl font-bold text-center mb-4">{title}</h2>
+              <Dialog.Panel className="relative w-full max-w-full md:max-w-md overflow-hidden md:rounded-2xl bg-white p-6 pt-14 text-left md:shadow-xl transition-all">
+                <h2 className="text-2xl font-bold text-left mb-4">{title}</h2>
                 <p className="text-lg text-gray-700">
                   {renderTextWithLineBreaks(text)}
                 </p>
