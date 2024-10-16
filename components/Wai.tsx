@@ -36,9 +36,7 @@ function Wai({ callerId }: WaiProps) {
     request: requestWakeLock, 
     release: releaseWakeLock 
   } = useWakeLock({
-    //onRequest: () => console.log("Screen Wake Lock: requested!"),
     onError: (e) => console.error("An error happened 💥", e),
-    //onRelease: () => console.log("Screen Wake Lock: released!"),
   });
 
   const wakeLockRequest = () => {
@@ -152,7 +150,7 @@ function Wai({ callerId }: WaiProps) {
   }, [callId]);
 
   const startCall = async () => {
-    requestWakeLock();
+    wakeLockRequest();
     setIsSettingUp(true);
 
     const { callId, accessToken } = await registerCall(
@@ -175,9 +173,7 @@ function Wai({ callerId }: WaiProps) {
   };
 
   const stopCall = () => {
-    if (wakeLockActive) {
-      releaseWakeLock();
-    }
+    wakeLockRelease();
 
     retell.stopCall();
   };
