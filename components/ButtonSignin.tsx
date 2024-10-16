@@ -19,31 +19,31 @@ const ButtonSignin = ({
 }) => {
   const user = useGetUser();
 
-  // if (user) {
-  //   return (
-  //     <Link
-  //       href={config.auth.callbackUrl}
-  //       className={`btn ${extraStyle ? extraStyle : ""}`}
-  //     >
-  //       {/* {user?.user_metadata?.avatar_url ? (
-  //         <img
-  //           src={user?.user_metadata?.avatar_url}
-  //           alt={user?.user_metadata?.name || "Account"}
-  //           className="w-6 h-6 rounded-full shrink-0"
-  //           referrerPolicy="no-referrer"
-  //           width={24}
-  //           height={24}
-  //         />
-  //       ) : (
-  //         <span className="w-6 h-6 bg-base-300 flex justify-center items-center rounded-full shrink-0">
-  //           {user?.user_metadata?.name?.charAt(0) || user?.email?.charAt(0)}
-  //         </span>
-  //       )} */}
-  //       {/* {user?.user_metadata?.name || user?.email || "Account"} */}
-  //       Talk to Wai
-  //     </Link>
-  //   );
-  // }
+  if (user) {
+    return (
+      <Link
+        href={config.auth.callbackUrl}
+        className={`btn ${extraStyle ? extraStyle : ""}`}
+      >
+        {/* {user?.user_metadata?.avatar_url ? (
+          <img
+            src={user?.user_metadata?.avatar_url}
+            alt={user?.user_metadata?.name || "Account"}
+            className="w-6 h-6 rounded-full shrink-0"
+            referrerPolicy="no-referrer"
+            width={24}
+            height={24}
+          />
+        ) : (
+          <span className="w-6 h-6 bg-base-300 flex justify-center items-center rounded-full shrink-0">
+            {user?.user_metadata?.name?.charAt(0) || user?.email?.charAt(0)}
+          </span>
+        )} */}
+        {/* {user?.user_metadata?.name || user?.email || "Account"} */}
+        Talk to Wai
+      </Link>
+    );
+  }
 
   return (
     <Link
