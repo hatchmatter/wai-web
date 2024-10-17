@@ -6,14 +6,13 @@ import React, { useState } from "react";
 import Modal from "@/components/ModalBetaTerms";
 
 export default function ConfirmInvite() {
-  const [agreed, setAgreed] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const searchParams = useSearchParams();
   const token = searchParams.get("token_hash");
   const type = searchParams.get("type");
   const title = "Terms and Conditions";
-  const terms =
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+  const terms = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 
   if (!token || !type) {
     redirect("/");
@@ -27,7 +26,7 @@ export default function ConfirmInvite() {
   const confirmInvite = (e: any) => {
     e.preventDefault();
 
-    if (agreed) {
+    if (agreedToTerms) {
       window.location.href = `/api/auth/confirm?token_hash=${token}&type=${type}&agreed_to_beta_terms="true"`;
     }
   };
@@ -51,7 +50,7 @@ export default function ConfirmInvite() {
             <input
               id="termsCheckbox"
               type="checkbox"
-              onChange={(e) => setAgreed(e.target.checked)}
+              onChange={(e) => setAgreedToTerms(e.target.checked)}
               className="checkbox align-middle"
             />
             <label
@@ -68,7 +67,7 @@ export default function ConfirmInvite() {
             </label>
             <button
               type="submit"
-              disabled={!agreed}
+              disabled={!agreedToTerms}
               className="btn btn-primary btn-block mt-4"
             >
               Confirm
