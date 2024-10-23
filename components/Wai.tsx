@@ -77,7 +77,7 @@ function Wai({ callerId }: WaiProps) {
 
     return () => {
       window.removeEventListener("visibilitychange", handleVisibilityChange);
-      //stopCall();
+      stopCall();
     };
   }, []);
 
