@@ -56,7 +56,7 @@ scoop install supabase
 - Create migrations using the supabase cli `supabase migration new <migration_name>`
 - Run `supabase migrate up` to apply migrations
 - Run `supabase db reset` to reset the database, apply all migrations, and seed the database
-  - After resetting you'll have to create a new user via the supabase admin interface [http://127.0.0.1:54323](http://127.0.0.1:54323/)
+  - After resetting you'll have to add a user. Navigate to the Authentication page in the supabase admin interface [http://127.0.0.1:54323](http://127.0.0.1:54323/)
 
 ### Emails
 - Check transactional emails like login links at [http://127.0.0.1:54324/](http://127.0.0.1:54324/)

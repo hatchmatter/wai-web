@@ -39,6 +39,16 @@ export async function POST(req: NextRequest) {
       .maybeSingle();
 
     if (callerError) {
+      throw callerError;
+    }
+
+    const { data: settings, error: settingsError } = await supabase
+      .from("settings")
+      .select("assistant_name, agent_id")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (callerError) {
       console.error("Error fetching caller:", callerError);
       return NextResponse.json(
         { error: "Failed to fetch caller data" },

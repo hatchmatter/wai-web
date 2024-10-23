@@ -11,6 +11,7 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code");
   const token_hash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
+  const agreedToBetaTerms = searchParams.get('agreed_to_beta_terms');
 
   try {
     const cookieStore = cookies();
@@ -25,14 +26,25 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(`${origin}${config.auth.callbackUrl}`);
     }
 
-    // For Magic Link
+    // For Invites
     if (token_hash && type) {
-      const { error } = await supabase.auth.verifyOtp({
+      if (!agreedToBetaTerms) throw new Error("You have not agreed to the terms");
+
+      const { data, error } = await supabase.auth.verifyOtp({
         type,
         token_hash,
       });
 
       if (error) throw error;
+
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .insert({
+          id: data.user.id,
+          agreed_to_beta_terms: true
+        });
+
+      if (profileError) throw profileError;
 
       return NextResponse.redirect(`${origin}${config.auth.callbackUrl}`);
     }
