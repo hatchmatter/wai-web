@@ -1,4 +1,4 @@
-# WAI Web
+# WAI Web (DEFUNCT)
 
 ## Architecture
 [Diagram](https://s.icepanel.io/W7ywJJ89DYtzBE/50WS)
